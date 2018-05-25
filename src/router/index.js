@@ -62,6 +62,7 @@ export default new Router({
   routes: constantRouterMap
 })
 
+// 异步动态路由表
 export const asyncRouterMap = [
   {
     path: '/permission',
