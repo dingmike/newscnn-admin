@@ -16,5 +16,6 @@ export function setToken(token) {
 }
 
 export function removeToken() {
+  debugger
   return Cookies.remove(TokenKey)
 }
