@@ -1,4 +1,4 @@
-import { asyncRouterMap, constantRouterMap } from '@/router'
+import {asyncRouterMap, constantRouterMap} from '@/router'
 
 /**
  * 通过meta.role判断是否与当前用户权限匹配
@@ -43,9 +43,16 @@ const permission = {
     }
   },
   actions: {
-    GenerateRoutes({ commit }, data) {
+    GenerateRoutes({commit}, data) {
       return new Promise(resolve => {
-        const { roles } = data
+        debugger
+        // roles=[{},{role_code:',role_name:''}]
+        const {roles} = data
+        let roleStr = ''
+        for (let i = 0; i < roles.length; i++) {
+          roleStr = roleStr + roles[i].role_name + ','
+        }
+        console.log('roles_String: ' + roleStr)
         let accessedRouters
         if (roles.indexOf('admin') >= 0) {
           accessedRouters = asyncRouterMap

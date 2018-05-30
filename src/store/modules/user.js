@@ -68,7 +68,7 @@ const user = {
 
     // 获取用户信息
     GetUserInfo({commit, state}) {
-      for (var key in state) {
+      for (let key in state) {
         console.log('key:' + key + ' value:' + state[key])
       }
       return new Promise((resolve, reject) => {
@@ -78,16 +78,19 @@ const user = {
           //   reject('error')
           // }
           const data = response.data
-
-          if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-            commit('SET_ROLES', data.roles)
+          if (data.data.roles && data.data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
+            const rolesArr = []
+            for (let i = 0; i < data.data.roles.length; i++) {
+              rolesArr.push(data.data.roles[i].role_name)
+            }
+            commit('SET_ROLES', rolesArr)
           } else {
             reject('getInfo: roles must be a non-null array !')
           }
 
-          commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
-          commit('SET_INTRODUCTION', data.introduction)
+          commit('SET_NAME', data.data.username)
+          commit('SET_AVATAR', data.data.avatar)
+          // commit('SET_INTRODUCTION', data.introduction)
           resolve(response)
         }).catch(error => {
           reject(error)
