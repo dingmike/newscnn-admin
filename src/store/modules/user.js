@@ -68,7 +68,7 @@ const user = {
 
     // 获取用户信息
     GetUserInfo({commit, state}) {
-      for (let key in state) {
+      for (var key in state) {
         console.log('key:' + key + ' value:' + state[key])
       }
       return new Promise((resolve, reject) => {
