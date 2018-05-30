@@ -95,10 +95,16 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+            debugger
           this.loading = true
-          this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
+          this.$store.dispatch('LoginByUsername', this.loginForm).then((res) => {
             this.loading = false
-            this.$router.push({ path: '/' })
+debugger
+            if(res.errno===0){
+              this.$router.push({ path: '/' })
+            }else{
+              this.$message.error(res.errmsg)
+            }
           }).catch(() => {
             this.loading = false
           })

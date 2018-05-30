@@ -59,7 +59,7 @@ const user = {
           commit('SET_TOKEN', data.token)
           commit('SET_USERID', data.userInfo.id)
           setToken(data.token)
-          resolve()
+          resolve(response.data)
         }).catch(error => {
           reject(error)
         })
@@ -115,7 +115,7 @@ const user = {
     // 登出
     LogOut({commit, state}) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        logout(state.userId).then(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           removeToken()
