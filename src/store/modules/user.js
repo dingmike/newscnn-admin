@@ -1,5 +1,5 @@
-import { loginByUsername, logout, getUserInfo } from '@/api/login'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import {loginByUsername, logout, getUserInfo} from '@/api/login'
+import {getToken, setToken, removeToken} from '@/utils/auth'
 
 const user = {
   state: {
@@ -7,6 +7,7 @@ const user = {
     status: '',
     code: '',
     token: getToken(),
+    userId: '',
     name: '',
     avatar: '',
     introduction: '',
@@ -22,6 +23,9 @@ const user = {
     },
     SET_TOKEN: (state, token) => {
       state.token = token
+    },
+    SET_USERID: (state, id) => {
+      state.userId = id
     },
     SET_INTRODUCTION: (state, introduction) => {
       state.introduction = introduction
@@ -45,7 +49,7 @@ const user = {
 
   actions: {
     // 用户名登录
-    LoginByUsername({ commit }, userInfo) {
+    LoginByUsername({commit}, userInfo) {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
@@ -53,6 +57,7 @@ const user = {
           const data = response.data.data
           console.log(data.token)
           commit('SET_TOKEN', data.token)
+          commit('SET_USERID', data.userInfo.id)
           setToken(data.token)
           resolve()
         }).catch(error => {
@@ -62,9 +67,12 @@ const user = {
     },
 
     // 获取用户信息
-    GetUserInfo({ commit, state }) {
+    GetUserInfo({commit, state}) {
+      for (var key in state) {
+        console.log('key:' + key + ' value:' + state[key])
+      }
       return new Promise((resolve, reject) => {
-        getUserInfo(state.token).then(response => {
+        getUserInfo(state.userId).then(response => {
           debugger
           // if (!response.data) { // 由于mockjs 不支持自定义状态码只能这样hack
           //   reject('error')
@@ -102,7 +110,7 @@ const user = {
     // },
 
     // 登出
-    LogOut({ commit, state }) {
+    LogOut({commit, state}) {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
           commit('SET_TOKEN', '')
@@ -116,7 +124,7 @@ const user = {
     },
 
     // 前端 登出
-    FedLogOut({ commit }) {
+    FedLogOut({commit}) {
       return new Promise(resolve => {
         debugger
         commit('SET_TOKEN', '')
@@ -126,7 +134,7 @@ const user = {
     },
 
     // 动态修改权限
-    ChangeRoles({ commit }, role) {
+    ChangeRoles({commit}, role) {
       return new Promise(resolve => {
         commit('SET_TOKEN', role)
         setToken(role)
