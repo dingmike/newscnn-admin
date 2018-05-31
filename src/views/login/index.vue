@@ -103,7 +103,12 @@ debugger
             if(res.errno===0){
               this.$router.push({ path: '/' })
             }else{
-              this.$message.error(res.errmsg)
+//              this.$message.error(res.errmsg)
+              this.$message({
+                showClose: true,
+                message: res.errmsg,
+                type: 'error'
+              });
             }
           }).catch(() => {
             this.loading = false

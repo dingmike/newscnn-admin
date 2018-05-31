@@ -54,12 +54,16 @@ const user = {
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
           debugger
-          const data = response.data.data
-          console.log(data.token)
-          commit('SET_TOKEN', data.token)
-          commit('SET_USERID', data.userInfo.id)
-          setToken(data.token)
-          resolve(response.data)
+
+          if(response.data.errno===0){
+            const data = response.data.data
+            console.log(data.token)
+            commit('SET_TOKEN', data.token)
+            commit('SET_USERID', data.userInfo.id)
+            setToken(data.token)
+          }
+            resolve(response.data)
+
         }).catch(error => {
           reject(error)
         })
