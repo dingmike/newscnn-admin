@@ -7,6 +7,7 @@ export default {
     pagePermission: 'Page Permission',
     directivePermission: 'Directive Permission',
     icons: 'Icons',
+    productManage: 'Product Manage',
     components: 'Components',
     componentIndex: 'Introduction',
     tinymce: 'Tinymce',

@@ -43,6 +43,7 @@ export const constantRouterMap = [
       meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
     }]
   },
+
   {
     path: '/documentation',
     component: Layout,
@@ -93,6 +94,19 @@ export const asyncRouterMap = [
     }]
   },
 
+  //-----------my navbar start---------------------//
+  {
+    path: '/productManage',
+    component: Layout,
+    children: [{
+      path: 'index',
+      component: _import('productManage/index'),
+      name: 'productManage',
+      meta: { title: 'productManage', icon: 'eye', noCache: true }
+    }]
+  },
+
+  //-----------my navbar end---------------------//
   {
     path: '/icon',
     component: Layout,
