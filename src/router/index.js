@@ -105,6 +105,19 @@ export const asyncRouterMap = [
       meta: { title: 'productManage', icon: 'eye', noCache: true }
     }]
   },
+  // { path: '/addProduct', component: _import('productManage/addProduct'), hidden: false },
+  {
+    path: '/addProduct',
+    component: Layout,
+    redirect: '/productManage/addProduct',
+    children: [{
+      path: 'index',
+      component: _import('productManage/addProduct'),
+      name: 'addProduct',
+      meta: { title: 'addProduct', icon: 'documentation', noCache: true }
+    }],
+    hidden: false
+  },
 
   //-----------my navbar end---------------------//
   {

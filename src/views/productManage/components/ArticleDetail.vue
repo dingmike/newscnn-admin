@@ -2,7 +2,7 @@
   <div class="createPost-container">
     <el-form class="form-container" :model="postForm" :rules="rules" ref="postForm">
 
-      <sticky :className="'sub-navbar '+postForm.status">
+<!--      <sticky :className="'sub-navbar '+postForm.status">
         <template v-if="fetchSuccess">
 
           <router-link style="margin-right:15px;" v-show='isEdit' :to="{ path:'create-form'}">
@@ -11,7 +11,7 @@
 
           <el-dropdown trigger="click">
             <el-button plain>{{!postForm.comment_disabled?'评论已打开':'评论已关闭'}}
-              <i class="el-icon-caret-bottom el-icon--right"></i>
+              <i class="el-icon-caret-bottom el-icon&#45;&#45;right"></i>
             </el-button>
             <el-dropdown-menu class="no-padding" slot="dropdown">
               <el-dropdown-item>
@@ -25,7 +25,7 @@
 
           <el-dropdown trigger="click">
             <el-button plain>平台
-              <i class="el-icon-caret-bottom el-icon--right"></i>
+              <i class="el-icon-caret-bottom el-icon&#45;&#45;right"></i>
             </el-button>
             <el-dropdown-menu class="no-border" slot="dropdown">
               <el-checkbox-group v-model="postForm.platforms" style="padding: 5px 15px;">
@@ -39,7 +39,7 @@
           <el-dropdown trigger="click">
             <el-button plain>
               外链
-              <i class="el-icon-caret-bottom el-icon--right"></i>
+              <i class="el-icon-caret-bottom el-icon&#45;&#45;right"></i>
             </el-button>
             <el-dropdown-menu class="no-padding no-border" style="width:300px" slot="dropdown">
               <el-form-item label-width="0px" style="margin-bottom: 0px" prop="source_uri">
@@ -59,19 +59,36 @@
           <el-tag>发送异常错误,刷新页面,或者联系程序员</el-tag>
         </template>
 
-      </sticky>
+      </sticky>-->
 
       <div class="createPost-main-container">
+
+        <!--商品主图片上传-->
         <el-row>
-          <el-col :span="21">
-            <el-form-item style="margin-bottom: 40px;" prop="title">
-              <MDinput name="name" v-model="postForm.title" required :maxlength="100">
-                标题
+          <el-form-item label-width="45px" label="主图:" class="postInfo-container-item">
+            <Upload v-model="postForm.image_uri"></Upload>
+          </el-form-item>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12">
+            <el-form-item style="margin-bottom: 8px;" prop="title">
+              <MDinput class="" name="name" v-model="postForm.title" required :maxlength="40">
+                商品标题
               </MDinput>
-              <span v-show="postForm.title.length>=26" class='title-prompt'>app可能会显示不全</span>
+              <span v-show="postForm.title.length>=40" class='title-prompt'>不能超过40个字</span>
+            </el-form-item>
+            <el-form-item style="margin-bottom: 8px;" prop="title">
+              <MDinput name="name" v-model="postForm.title" required :maxlength="40">
+                卖点介绍
+              </MDinput>
+              <span v-show="postForm.title.length>=40" class='title-prompt'>不能超过40个字</span>
             </el-form-item>
 
-            <div class="postInfo-container">
+
+
+
+        <!--    <div class="postInfo-container">
               <el-row>
                 <el-col :span="8">
                   <el-form-item label-width="45px" label="作者:" class="postInfo-container-item">
@@ -98,9 +115,18 @@
                   </el-form-item>
                 </el-col>
               </el-row>
-            </div>
+            </div>-->
           </el-col>
         </el-row>
+
+        <!--添加 规格-->
+        <el-row>
+          <div>商品规格</div>
+          <el-button type="primary" icon="el-icon-plus" plain>添加规格</el-button>
+        </el-row>
+
+        <!--添加规格 end-->
+
 
         <el-form-item style="margin-bottom: 40px;" label-width="45px" label="摘要:">
           <el-input type="textarea" class="article-textarea" :rows="1" autosize placeholder="请输入内容" v-model="postForm.content_short">
@@ -289,6 +315,7 @@ export default {
         @include clearfix;
         margin-bottom: 10px;
         .postInfo-container-item {
+
           float: left;
         }
       }

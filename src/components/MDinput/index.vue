@@ -117,8 +117,8 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
   // Fonts:
-  $font-size-base: 16px;
-  $font-size-small: 18px;
+  $font-size-base: 14px;
+  $font-size-small: 16px;
   $font-size-smallest: 12px;
   $font-weight-normal: normal;
   $font-weight-bold: bold;
