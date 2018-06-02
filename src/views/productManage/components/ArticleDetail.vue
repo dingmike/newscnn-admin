@@ -97,8 +97,6 @@
             </el-form-item>-->
 
 
-
-
         <!--    <div class="postInfo-container">
               <el-row>
                 <el-col :span="8">
@@ -132,7 +130,7 @@
 
         <!--添加 规格-->
         <el-row>
-          <div>商品规格</div>
+          <el-form-item label="商品规格"></el-form-item>
           <el-button type="primary" icon="el-icon-plus" plain>添加规格</el-button>
         </el-row>
 
