@@ -1,6 +1,6 @@
 <template>
   <div class="createPost-container">
-    <el-form class="form-container" :model="postForm" :rules="rules" ref="postForm">
+    <el-form class="form-container" :model="postForm" :rules="rules" ref="postForm" label-width="80px">
 
 <!--      <sticky :className="'sub-navbar '+postForm.status">
         <template v-if="fetchSuccess">
@@ -72,18 +72,29 @@
 
         <el-row>
           <el-col :span="12">
-            <el-form-item style="margin-bottom: 8px;" prop="title">
-              <MDinput class="" name="name" v-model="postForm.title" required :maxlength="40">
+            <el-form-item label="商品标题" prop="title">
+              <el-input v-model="postForm.title"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卖点介绍" prop="introduce">
+              <el-input v-model="postForm.introduce"></el-input>
+            </el-form-item>
+
+
+            <!--<el-form-item style="margin-bottom: 0px;" prop="title">
+              <MDinput name="title" v-model="postForm.title" required :maxlength="50">
                 商品标题
               </MDinput>
-              <span v-show="postForm.title.length>=40" class='title-prompt'>不能超过40个字</span>
+              <span v-show="postForm.title.length>=50" class='title-prompt'>商品标题不可大于 50 个字
+卖点介绍</span>
             </el-form-item>
             <el-form-item style="margin-bottom: 8px;" prop="title">
-              <MDinput name="name" v-model="postForm.title" required :maxlength="40">
+              <MDinput name="introduce" v-model="postForm.title" required :maxlength="50">
                 卖点介绍
               </MDinput>
-              <span v-show="postForm.title.length>=40" class='title-prompt'>不能超过40个字</span>
-            </el-form-item>
+              <span v-show="postForm.title.length>=50" class='title-prompt'>卖点介绍不可大于 50 个字
+卖点介绍</span>
+            </el-form-item>-->
 
 
 
@@ -161,7 +172,8 @@ import { userSearch } from '@/api/remoteSearch'
 
 const defaultForm = {
   status: 'draft',
-  title: '', // 文章题目
+  introduce: '', // 商品卖点介绍
+  title: '', // 商品标题
   content: '', // 文章内容
   content_short: '', // 文章摘要
   source_uri: '', // 文章外链
@@ -220,10 +232,38 @@ export default {
         { key: 'c-platform', name: 'c-platform' }
       ],
       rules: {
-        image_uri: [{ validator: validateRequire }],
-        title: [{ validator: validateRequire }],
-        content: [{ validator: validateRequire }],
-        source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
+        title: [
+          { required: true, message: '请输入商品标题', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 50 个字符', trigger: 'blur' }
+        ],
+        introduce: [
+          { required: true, message: '请输入卖点介绍', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 50 个字符', trigger: 'blur' }
+        ],
+        region: [
+          { required: true, message: '请选择活动区域', trigger: 'change' }
+        ],
+        date1: [
+          { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+        ],
+        date2: [
+          { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
+        ],
+        type: [
+          { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
+        ],
+        resource: [
+          { required: true, message: '请选择活动资源', trigger: 'change' }
+        ],
+        desc: [
+          { required: true, message: '请填写活动形式', trigger: 'blur' }
+        ]
+
+//
+//        image_uri: [{ validator: validateRequire }],
+//        title: [{ validator: validateRequire }],
+//        content: [{ validator: validateRequire }],
+//        source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
       }
     }
   },
@@ -315,7 +355,6 @@ export default {
         @include clearfix;
         margin-bottom: 10px;
         .postInfo-container-item {
-
           float: left;
         }
       }

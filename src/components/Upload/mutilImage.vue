@@ -98,17 +98,17 @@ export default {
 }
 </script>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
+<style rel="stylesheet/scss" lang="scss">
 @import "src/styles/mixin.scss";
 .upload-container {
-  /*width: 100%;*/
+  width: 100%;
   position: relative;
   @include clearfix;
   .image-uploader {
     /*width: 10%;*/
     float: left;
   }
-  .image-preview {
+ /* .image-preview {
     width: 100px;
     height: 100px;
     position: relative;
@@ -166,6 +166,6 @@ export default {
       line-height: 64px;
       color: #fff;
     }
-  }
+  }*/
 }
 </style>

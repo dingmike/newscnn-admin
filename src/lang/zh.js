@@ -8,6 +8,7 @@ export default {
     directivePermission: '指令权限',
     icons: '图标',
     productManage: '商品管理',
+    addProduct: '添加商品',
     components: '组件',
     componentIndex: '介绍',
     tinymce: '富文本编辑器',

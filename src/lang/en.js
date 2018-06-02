@@ -8,6 +8,7 @@ export default {
     directivePermission: 'Directive Permission',
     icons: 'Icons',
     productManage: 'Product Manage',
+    addProduct: 'Add product',
     components: 'Components',
     componentIndex: 'Introduction',
     tinymce: 'Tinymce',
