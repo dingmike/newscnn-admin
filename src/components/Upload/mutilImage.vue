@@ -98,10 +98,10 @@ export default {
 }
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
+<style rel="stylesheet/scss" lang="scss" scoped>
 @import "src/styles/mixin.scss";
 .upload-container {
-  width: 100%;
+  /*width: 100%;*/
   position: relative;
   @include clearfix;
   .image-uploader {
