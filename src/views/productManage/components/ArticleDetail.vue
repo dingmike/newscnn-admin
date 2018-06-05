@@ -66,18 +66,18 @@
         <!--商品主图片上传-->
         <el-row>
           <el-form-item label-width="45px" label="主图:" class="postInfo-container-item">
-            <Upload v-model="postForm.image_uri"></Upload>
+            <Upload v-model="postForm.primary_pic_url"></Upload>
           </el-form-item>
         </el-row>
 
         <el-row>
           <el-col :span="12">
             <el-form-item label="商品标题" prop="title">
-              <el-input v-model="postForm.title"></el-input>
+              <el-input v-model="postForm.name"></el-input>
             </el-form-item>
 
             <el-form-item label="卖点介绍" prop="introduce">
-              <el-input v-model="postForm.introduce"></el-input>
+              <el-input v-model="postForm.goods_brief"></el-input>
             </el-form-item>
 
 
@@ -127,30 +127,90 @@
             </div>-->
           </el-col>
         </el-row>
-
+        <div class="form_divider"></div>
         <!--添加 规格-->
         <el-row>
           <el-form-item label="商品规格"></el-form-item>
-          <el-button type="primary" icon="el-icon-plus" plain>添加规格</el-button>
+          <el-button icon="el-icon-plus" size="mini" plain>添加规格</el-button>
         </el-row>
 
         <!--添加规格 end-->
 
 
-        <el-form-item style="margin-bottom: 40px;" label-width="45px" label="摘要:">
+    <!--    <el-form-item style="margin-bottom: 40px;" label-width="45px" label="摘要:">
           <el-input type="textarea" class="article-textarea" :rows="1" autosize placeholder="请输入内容" v-model="postForm.content_short">
           </el-input>
           <span class="word-counter" v-show="contentShortLength">{{contentShortLength}}字</span>
-        </el-form-item>
+        </el-form-item>-->
 
+        <el-row style="padding: 12px 0">
+          商品参数
+        </el-row>
+        <!--参数列表-->
+
+        <el-form :model="postForm.productParamsForm">
+          <el-table :data="postForm.productParamsForm" border="false" fit="true"
+                    highlight-current-row="true"
+                    show-header="true"
+                    tooltip-effect="dark"
+                    ref="multipleTable"
+                    @selection-change="handleSelectionChange"
+                    style="width: 100%">
+            <el-table-column align="center" label="属性分类" width="" v-loading="loading"
+                             element-loading-text="请给我点时间！">
+              <template slot-scope="scope">
+                <!--<el-select v-model="postForm.productParamsForm.attribute_category" placeholder="属性分类">
+                  <el-option label="家具" value="shanghai"></el-option>
+                  <el-option label="灯具" value="beijing"></el-option>
+                  <el-option label="床品件套" value="beijing"></el-option>
+                </el-select>-->
+                <el-select v-model="scope.row.attribute_category" filterable placeholder="请输入分类">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="属性名称" width="" v-loading="loading"
+                             element-loading-text="请给我点时间！">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.attribute_name" auto-complete="off"></el-input>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="" align="center" label="属性描述">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.attribute_des" auto-complete="off"></el-input>
+              </template>
+            </el-table-column>
+
+          </el-table>
+        </el-form>
+
+
+
+
+
+
+
+        <!--参数列表--end-->
+        <div class="form_divider"></div>
+        <el-button icon="el-icon-plus" size="mini" plain>添加参数</el-button>
+
+
+        <div class="form_divider"></div>
+
+        <el-row style="padding: 12px 0">
+           商品详情
+        </el-row>
         <div class="editor-container">
-          <tinymce :height=400 ref="editor" v-model="postForm.content"></tinymce>
+          <tinymce :height=400 ref="editor" v-model="postForm.goods_desc"></tinymce>
         </div>
 
-        <!--上传图片多图-->
-        <div style="margin-bottom: 20px;">
-          <Upload v-model="postForm.image_uri"></Upload>
-        </div>
+        <div class="form_divider"></div>
       </div>
     </el-form>
 
@@ -170,15 +230,20 @@ import { userSearch } from '@/api/remoteSearch'
 
 const defaultForm = {
   status: 'draft',
-  introduce: '', // 商品卖点介绍
-  title: '', // 商品标题
-  content: '', // 文章内容
+  goods_brief: '', // 商品卖点介绍
+  name: '', // 商品标题
+  goods_desc: '', // 商品详情
   content_short: '', // 文章摘要
   source_uri: '', // 文章外链
-  image_uri: '', // 文章图片
+  primary_pic_url: '', // 商品主要图片
   source_name: '', // 文章外部作者
   display_time: undefined, // 前台展示时间
   id: undefined,
+  productParamsForm:[{
+    attribute_category: '家具',
+    attribute_name: '涂漆',
+    attribute_des: '环保涂漆'
+  }],
   platforms: ['a-platform'],
   comment_disabled: false
 }
@@ -223,6 +288,22 @@ export default {
       postForm: Object.assign({}, defaultForm),
       fetchSuccess: true,
       loading: false,
+      options: [{
+        value: '选项1',
+        label: '家具'
+      }, {
+        value: '选项2',
+        label: '双皮奶'
+      }, {
+        value: '选项3',
+        label: '蚵仔煎'
+      }, {
+        value: '选项4',
+        label: '龙须面'
+      }, {
+        value: '选项5',
+        label: '北京烤鸭'
+      }],
       userLIstOptions: [],
       platformsOptions: [
         { key: 'a-platform', name: 'a-platform' },
@@ -367,6 +448,10 @@ export default {
             }
         }
       }
+      .form_divider {
+        border-top: 1px solid #c5c5c5;
+        margin: 15px 0;
+      }
     }
     .word-counter {
       width: 40px;
@@ -375,5 +460,6 @@ export default {
       top: 0px;
     }
   }
+
 </style>
 

@@ -110,7 +110,9 @@
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
-      handleEdit() {
+      handleEdit(row) {
+debugger
+        // 编辑商品跳转
 
       },
       handleDownProduct() {

@@ -1,6 +1,15 @@
 <template>
   <div class="tab-container">
-    <el-tag>mounted times ：{{createdTimes}}</el-tag>
+    <!--<el-tag>mounted times ：{{createdTimes}}</el-tag>-->
+
+    <el-row :gutter="20">
+      <el-col :span="4">  <el-button type="primary" icon="el-icon-plus" @click="goAddProduct()">添加商品</el-button></el-col>
+      <el-col :span="4" :offset="16">
+        <el-input placeholder="商品名称搜索" v-model="input5" class="input-with-select">
+          <el-button slot="append" icon="el-icon-search"  @click="onSubmit"></el-button>
+        </el-input>
+      </el-col>
+    </el-row>
     <el-tabs style='margin-top:15px;' v-model="activeName" type="border-card">
       <el-tab-pane v-for="item in tabMapOptions" :label="item.label" :key='item.key' :name="item.key">
         <keep-alive>
@@ -25,12 +34,16 @@
           { label: '已下架', key: 'JP' }
         ],
         activeName: 'CN',
-        createdTimes: 0
+        createdTimes: 0,
+        productName: ''
       }
     },
     methods: {
       showCreatedTimes() {
         this.createdTimes = this.createdTimes + 1
+      },
+      goAddProduct() {
+        this.$router.push({ path: '/addProduct/index' })
       }
     }
   }
