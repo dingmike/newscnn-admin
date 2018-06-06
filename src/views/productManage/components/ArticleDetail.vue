@@ -29,15 +29,15 @@
         <el-row :gutter="20" style="padding: 12px">
           <el-form-item label="商品规格"></el-form-item>
         </el-row>
-        <el-form v-for="(spec,index) in postForm.product_specs" :key="index">
-          <el-card style="margin-bottom: 20px;height: 11rem; background-color: #fff; padding: 6px">
+        <el-form v-for="(spec, index) in postForm.product_specs" :key="index">
+          <el-card style="margin-bottom: 20px;height: 12rem; background-color: #fff; padding: 6px">
             <el-row>
-              <el-col :span="2">
+              <el-col :span="3">
                 <el-form-item>规格名（如：颜色）:</el-form-item>
               </el-col>
-              <el-col :span="3" style="padding: 0 5px">
+              <el-col :span="4" style="padding: 0 5px">
                 <el-form-item>
-                  <el-select v-model="spec.type" filterable placeholder="选择或创建规格名">
+                  <el-select size="small" v-model="spec.type" filterable allow-create placeholder="选择或创建规格名" @change="renderAddSpec(index)">
                     <el-option
                       v-for="item in productSpecsOptions"
                       :key="item.value"
@@ -55,8 +55,8 @@
               </el-col>
             </el-row>
             <!--规格值-->
-            <el-row>
-              <el-col :span="2">
+            <el-row v-if="spec.isShowValue">
+              <el-col :span="3">
                 <el-form-item>
                   规格值(如: 红色):
                 </el-form-item>
@@ -64,9 +64,9 @@
               <!--  <div v-for="specValue in spec.children">
                   {{specValue}}
                 </div>-->
-              <el-col style="padding: 0 5px" :span="2" v-for="(specValue, index2) in spec.children" :key="index2" @mouseover.native="toggleShow(index, index2)" @mouseout.native="toggleShow(index, index2)">
+              <el-col style="padding: 0 5px" :span="4" v-for="(specValue, index2) in spec.children" :key="index2" @mouseover.native="toggleShow(index, index2)" @mouseout.native="toggleShow(index, index2)">
                 <el-form-item>
-                  <el-select v-model="specValue.value" filterable placeholder="" >
+                  <el-select size="small" v-model="specValue.value" filterable allow-create placeholder="" >
                     <el-option
                       v-for="item in productSpecsOptions"
                       :key="item.value"
@@ -79,7 +79,7 @@
               </el-col>
               <el-col :span="2" style="padding-left: 10px">
                 <el-form-item>
-                  <el-button icon="el-icon-plus" size="mini" plain>添加规格值</el-button>
+                  <el-button icon="el-icon-plus" size="mini" @click="addSpecsValue(index)" plain>添加规格值</el-button>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -95,7 +95,38 @@
           <el-button icon="el-icon-plus" size="mini" @click="addProductSku()" plain>添加规格</el-button>
         </el-row>
 
+
+        <!--规格明细-->
+
+        <el-row :gutter="20" style="padding: 12px">
+          <el-form-item label="规格明细"></el-form-item>
+        </el-row>
+        <el-form>
+          <el-table :data="tableData" :key='key' border fit highlight-current-row style="width: 100%">
+            <el-table-column prop="name" label="fruitName" width="180"></el-table-column>
+            <el-table-column :key='fruit' v-for='fruit in formThead' :label="fruit">
+              <template slot-scope="scope">
+                {{scope.row[fruit]}}
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form>
+
+
+
+
+        <!--规格明细--end-->
+
+
+
+
         <!--添加规格 end-->
+
+
+
+
+
+
         <div class="form_divider"></div>
 
         <el-row style="padding: 12px 0">
@@ -104,7 +135,7 @@
         <!--参数列表-->
 
         <el-form>
-          <el-table :data="postForm.productParamsForm" border fit
+          <el-table :data="postForm.productParamsForm" fit
                     show-header
                     tooltip-effect="dark"
                     ref="multipleTable"
@@ -114,7 +145,7 @@
                              element-loading-text="请给我点时间！">
               <template slot-scope="scope">
 
-                <el-select v-model="scope.row.attribute_category" filterable placeholder="请输入分类">
+                <el-select size="small" v-model="scope.row.attribute_category" filterable placeholder="请输入分类">
                   <el-option
                     v-for="item in options"
                     :key="item.value"
@@ -127,13 +158,13 @@
             <el-table-column align="center" label="属性名称" width="" v-loading="loading"
                              element-loading-text="请给我点时间！">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.attribute_name" auto-complete="off"></el-input>
+                <el-input size="small" v-model="scope.row.attribute_name" auto-complete="off"></el-input>
               </template>
             </el-table-column>
 
             <el-table-column width="" align="center" label="属性描述">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.attribute_des" auto-complete="off"></el-input>
+                <el-input size="small" v-model="scope.row.attribute_des" auto-complete="off"></el-input>
               </template>
             </el-table-column>
             <el-table-column width="100" align="center" label="操作">
@@ -222,10 +253,12 @@ const defaultForm = {
   id: undefined,
   product_specs: [{
     type: '颜色',
+    isShowValue: false,
     children: [{value: '红',isShow: false}, {value:'蓝', isShow: false}]
   },
     {
       type: '尺寸',
+      isShowValue: false,
       children: [{value: '大', isShow: false}, {value:'中', isShow: false}]
     }
   ],
@@ -285,6 +318,25 @@ export default {
       visible2: false,
       setAttributeImg: false,
       isShow: false,
+      isShowValue: false,
+      tableData: [
+        {
+          name: 'fruit-1',
+          apple: 'apple-10',
+          banana: 'banana-10',
+          orange: 'orange-10'
+        },
+        {
+          name: 'fruit-2',
+          apple: 'apple-20',
+          banana: 'banana-20',
+          orange: 'orange-20'
+        }
+      ],
+      key: 1, // table key
+      formTheadOptions: ['apple', 'banana', 'orange'],
+      checkboxVal: ['apple', 'banana'], // checkboxVal
+      formThead: ['apple', 'banana'],// 默认表头 Default header
       attributeParam: {
         attribute_category: '',
         attribute_name: '',
@@ -365,6 +417,12 @@ export default {
 //        content: [{ validator: validateRequire }],
 //        source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
       }
+    }
+  },
+  watch: {
+    checkboxVal(valArr) {
+      this.formThead = this.formTheadOptions.filter(i => valArr.indexOf(i) >= 0)
+      this.key = this.key + 1// 为了保证table 每次都会重渲 In order to ensure the table will be re-rendered each time
     }
   },
   computed: {
@@ -454,6 +512,10 @@ export default {
     handleCheckedCategoryChange() {
 
     },
+    addSpecsValue(index) {
+      let obj = {value: '',isShow: false}
+      this.postForm.product_specs[index].children.push(obj)
+    },
     removeSpecs(item) {
       let index = this.postForm.product_specs.indexOf(item)
       if (index !== -1) {
@@ -465,6 +527,10 @@ export default {
     },
     toggleShow(index, index2) {
       this.postForm.product_specs[index].children[index2].isShow = !this.postForm.product_specs[index].children[index2].isShow
+    },
+    renderAddSpec(index) {
+      debugger
+      this.postForm.product_specs[index].isShowValue = true
     }
   }
 }
@@ -516,12 +582,12 @@ export default {
   }
   .delete-spec{
     position: relative;
-    top: -65px;
-    right: -111px;
+    top: -4rem;
+    right: -10rem;
     cursor: pointer;
   }
   .delete-spec-box{
-    font-size: 18px;
+    font-size: 20px;
     cursor: pointer;
     float: right;
   }
