@@ -5,8 +5,8 @@
     <el-row :gutter="20">
       <el-col :span="4">  <el-button type="primary" icon="el-icon-plus" @click="goAddProduct()">添加商品</el-button></el-col>
       <el-col :span="4" :offset="16">
-        <el-input placeholder="商品名称搜索" v-model="input5" class="input-with-select">
-          <el-button slot="append" icon="el-icon-search"  @click="onSubmit"></el-button>
+        <el-input placeholder="商品名称搜索" v-model="productName" class="input-with-select">
+          <el-button slot="append" icon="el-icon-search"  @click="search()"></el-button>
         </el-input>
       </el-col>
     </el-row>
@@ -44,6 +44,9 @@
       },
       goAddProduct() {
         this.$router.push({ path: '/addProduct/index' })
+      },
+      search() {
+
       }
     }
   }

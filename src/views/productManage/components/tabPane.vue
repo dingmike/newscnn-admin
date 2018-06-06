@@ -1,7 +1,7 @@
 <template>
-  <el-table :data="list" border="false" fit="true"
-            highlight-current-row="true"
-            show-header="true"
+  <el-table :data="list" border fit
+            highlight-current-row
+            show-header
             tooltip-effect="dark"
             ref="multipleTable"
             @selection-change="handleSelectionChange"

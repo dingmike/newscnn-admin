@@ -2,65 +2,6 @@
   <div class="createPost-container">
     <el-form class="form-container" :model="postForm" :rules="rules" ref="postForm" label-width="80px">
 
-<!--      <sticky :className="'sub-navbar '+postForm.status">
-        <template v-if="fetchSuccess">
-
-          <router-link style="margin-right:15px;" v-show='isEdit' :to="{ path:'create-form'}">
-            <el-button type="info">创建form</el-button>
-          </router-link>
-
-          <el-dropdown trigger="click">
-            <el-button plain>{{!postForm.comment_disabled?'评论已打开':'评论已关闭'}}
-              <i class="el-icon-caret-bottom el-icon&#45;&#45;right"></i>
-            </el-button>
-            <el-dropdown-menu class="no-padding" slot="dropdown">
-              <el-dropdown-item>
-                <el-radio-group style="padding: 10px;" v-model="postForm.comment_disabled">
-                  <el-radio :label="true">关闭评论</el-radio>
-                  <el-radio :label="false">打开评论</el-radio>
-                </el-radio-group>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-
-          <el-dropdown trigger="click">
-            <el-button plain>平台
-              <i class="el-icon-caret-bottom el-icon&#45;&#45;right"></i>
-            </el-button>
-            <el-dropdown-menu class="no-border" slot="dropdown">
-              <el-checkbox-group v-model="postForm.platforms" style="padding: 5px 15px;">
-                <el-checkbox v-for="item in platformsOptions" :label="item.key" :key="item.key">
-                  {{item.name}}
-                </el-checkbox>
-              </el-checkbox-group>
-            </el-dropdown-menu>
-          </el-dropdown>
-
-          <el-dropdown trigger="click">
-            <el-button plain>
-              外链
-              <i class="el-icon-caret-bottom el-icon&#45;&#45;right"></i>
-            </el-button>
-            <el-dropdown-menu class="no-padding no-border" style="width:300px" slot="dropdown">
-              <el-form-item label-width="0px" style="margin-bottom: 0px" prop="source_uri">
-                <el-input placeholder="请输入内容" v-model="postForm.source_uri">
-                  <template slot="prepend">填写url</template>
-                </el-input>
-              </el-form-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-
-          <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm()">发布
-          </el-button>
-          <el-button v-loading="loading" type="warning" @click="draftForm">草稿</el-button>
-
-        </template>
-        <template v-else>
-          <el-tag>发送异常错误,刷新页面,或者联系程序员</el-tag>
-        </template>
-
-      </sticky>-->
-
       <div class="createPost-main-container">
 
         <!--商品主图片上传-->
@@ -81,89 +22,98 @@
             </el-form-item>
 
 
-            <!--<el-form-item style="margin-bottom: 0px;" prop="title">
-              <MDinput name="title" v-model="postForm.title" required :maxlength="50">
-                商品标题
-              </MDinput>
-              <span v-show="postForm.title.length>=50" class='title-prompt'>商品标题不可大于 50 个字
-卖点介绍</span>
-            </el-form-item>
-            <el-form-item style="margin-bottom: 8px;" prop="title">
-              <MDinput name="introduce" v-model="postForm.title" required :maxlength="50">
-                卖点介绍
-              </MDinput>
-              <span v-show="postForm.title.length>=50" class='title-prompt'>卖点介绍不可大于 50 个字
-卖点介绍</span>
-            </el-form-item>-->
-
-
-        <!--    <div class="postInfo-container">
-              <el-row>
-                <el-col :span="8">
-                  <el-form-item label-width="45px" label="作者:" class="postInfo-container-item">
-                    <multiselect v-model="postForm.author" :options="userLIstOptions" @search-change="getRemoteUserList" placeholder="搜索用户" selectLabel="选择"
-                      deselectLabel="删除" track-by="key" :internalSearch="false" label="key">
-                      <span slot='noResult'>无结果</span>
-                    </multiselect>
-                  </el-form-item>
-                </el-col>
-
-                <el-col :span="8">
-                  <el-tooltip class="item" effect="dark" content="将替换作者" placement="top">
-                    <el-form-item label-width="50px" label="来源:" class="postInfo-container-item">
-                      <el-input placeholder="将替换作者" style='min-width:150px;' v-model="postForm.source_name">
-                      </el-input>
-                    </el-form-item>
-                  </el-tooltip>
-                </el-col>
-
-                <el-col :span="8">
-                  <el-form-item label-width="80px" label="发布时间:" class="postInfo-container-item">
-                    <el-date-picker v-model="postForm.display_time" type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间">
-                    </el-date-picker>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </div>-->
           </el-col>
         </el-row>
         <div class="form_divider"></div>
         <!--添加 规格-->
-        <el-row>
+        <el-row :gutter="20" style="padding: 12px">
           <el-form-item label="商品规格"></el-form-item>
           <el-button icon="el-icon-plus" size="mini" plain>添加规格</el-button>
         </el-row>
 
+
+        <el-form v-for="(spec,index) in postForm.product_specs" :key="index">
+          <el-card style="margin-bottom: 20px;height: 11rem; background-color: #fff6e4; padding: 6px">
+            <el-row>
+              <el-col :span="2">
+                <el-form-item>规格名（如：颜色）:</el-form-item>
+              </el-col>
+              <el-col :span="3">
+                <el-form-item>
+                  <el-select v-model="spec.type" filterable placeholder="选择或创建规格名">
+                    <el-option
+                      v-for="item in productSpecsOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+
+              </el-col>
+              <el-col :span="2" style="padding-left: 10px">
+                <el-form-item>
+                  <el-checkbox v-model="setAttributeImg">批量设置规格图片</el-checkbox>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <!--规格值-->
+            <el-row>
+              <el-col :span="2">
+                <el-form-item>
+                  规格值(如: 红色):
+                </el-form-item>
+              </el-col>
+              <!--  <div v-for="specValue in spec.children">
+                  {{specValue}}
+                </div>-->
+              <el-col style="padding: 0 5px" :span="2" v-for="(specValue, index2) in spec.children" :key="index2" @mouseover.native="toggleShow(index, index2)" @mouseout.native="toggleShow(index, index2)">
+                <el-form-item>
+                  <el-select v-model="specValue.value" filterable placeholder="" >
+                    <el-option
+                      v-for="item in productSpecsOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <i class="el-icon-error delete-spec" ref="" v-show="specValue.isShow"></i>
+              </el-col>
+              <el-col :span="2" style="padding-left: 10px">
+                <el-form-item>
+                  <el-button icon="el-icon-plus" size="mini" plain>添加规格值</el-button>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <!--规格值--end-->
+            <i class="el-icon-delete delete-spec-box" @click.prevent="removeSpecs(spec)"></i>
+            <!--<el-button @click.prevent="removeSpecs(spec)">删除</el-button>-->
+          </el-card>
+
+        </el-form>
+
+
+
+
         <!--添加规格 end-->
-
-
-    <!--    <el-form-item style="margin-bottom: 40px;" label-width="45px" label="摘要:">
-          <el-input type="textarea" class="article-textarea" :rows="1" autosize placeholder="请输入内容" v-model="postForm.content_short">
-          </el-input>
-          <span class="word-counter" v-show="contentShortLength">{{contentShortLength}}字</span>
-        </el-form-item>-->
 
         <el-row style="padding: 12px 0">
           商品参数
         </el-row>
         <!--参数列表-->
 
-        <el-form :model="postForm.productParamsForm">
-          <el-table :data="postForm.productParamsForm" border="false" fit="true"
-                    highlight-current-row="true"
-                    show-header="true"
+        <el-form>
+          <el-table :data="postForm.productParamsForm" border fit
+                    show-header
                     tooltip-effect="dark"
                     ref="multipleTable"
                     @selection-change="handleSelectionChange"
                     style="width: 100%">
-            <el-table-column align="center" label="属性分类" width="" v-loading="loading"
+            <el-table-column align="center" label="属性分类" width="180" v-loading="loading"
                              element-loading-text="请给我点时间！">
               <template slot-scope="scope">
-                <!--<el-select v-model="postForm.productParamsForm.attribute_category" placeholder="属性分类">
-                  <el-option label="家具" value="shanghai"></el-option>
-                  <el-option label="灯具" value="beijing"></el-option>
-                  <el-option label="床品件套" value="beijing"></el-option>
-                </el-select>-->
+
                 <el-select v-model="scope.row.attribute_category" filterable placeholder="请输入分类">
                   <el-option
                     v-for="item in options"
@@ -186,7 +136,24 @@
                 <el-input v-model="scope.row.attribute_des" auto-complete="off"></el-input>
               </template>
             </el-table-column>
+            <el-table-column width="100" align="center" label="操作">
+              <template slot-scope="scope">
 
+                <el-popover
+                  placement="top"
+                  width="100"
+                  v-model="visible2">
+                  <p>确定删除吗？</p>
+                  <div style="text-align: right; margin: 0">
+                    <el-button size="mini" type="text" @click="visible2 = false">取消</el-button>
+                    <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button>
+                  </div>
+                  <!--<el-button slot="reference">删除</el-button>-->
+                  <el-button slot="reference" type="danger" icon="el-icon-delete"   @click.native.prevent="deleteProductAttribute(scope.$index, postForm.productParamsForm)"></el-button>
+
+                </el-popover>
+              </template>
+            </el-table-column>
           </el-table>
         </el-form>
 
@@ -198,7 +165,7 @@
 
         <!--参数列表--end-->
         <div class="form_divider"></div>
-        <el-button icon="el-icon-plus" size="mini" plain>添加参数</el-button>
+        <el-button icon="el-icon-plus" size="mini" @click="addProductAttribute()" plain>添加参数</el-button>
 
 
         <div class="form_divider"></div>
@@ -211,6 +178,20 @@
         </div>
 
         <div class="form_divider"></div>
+
+        <el-row style="padding: 20px 0">
+          商品分类
+        </el-row>
+        <el-checkbox-group v-model="checkList" @change="handleCheckedCategoryChange">
+          <el-checkbox v-for="category in categories" :label="category" :key="category">{{category}}</el-checkbox>
+        </el-checkbox-group>
+        <div class="form_divider"></div>
+
+        <el-row style="padding: 20px 0">
+          <el-button type="primary" :loading="true">发布</el-button>
+        </el-row>
+
+
       </div>
     </el-form>
 
@@ -239,10 +220,23 @@ const defaultForm = {
   source_name: '', // 文章外部作者
   display_time: undefined, // 前台展示时间
   id: undefined,
+  product_specs: [{
+    type: '颜色',
+    children: [{value: '红',isShow: false}, {value:'蓝', isShow: false}]
+  },
+    {
+      type: '尺寸',
+      children: [{value: '大', isShow: false}, {value:'中', isShow: false}]
+    }
+  ],
   productParamsForm:[{
     attribute_category: '家具',
     attribute_name: '涂漆',
     attribute_des: '环保涂漆'
+  },{
+    attribute_category: '家具2',
+    attribute_name: '涂漆2',
+    attribute_des: '环保涂漆2'
   }],
   platforms: ['a-platform'],
   comment_disabled: false
@@ -288,6 +282,33 @@ export default {
       postForm: Object.assign({}, defaultForm),
       fetchSuccess: true,
       loading: false,
+      visible2: false,
+      setAttributeImg: false,
+      isShow: false,
+      attributeParam: {
+        attribute_category: '',
+        attribute_name: '',
+        attribute_des: ''
+      },
+      categories: ['居家', '餐厨', '饮食', '配件','服装','杂货'],
+      checkList: [],
+      productSpecsOptions: [
+          {
+        value: '选项1',
+        label: '家具'
+      }, {
+        value: '选项2',
+        label: '双皮奶'
+      }, {
+        value: '选项3',
+        label: '蚵仔煎'
+      }, {
+        value: '选项4',
+        label: '龙须面'
+      }, {
+        value: '选项5',
+        label: '北京烤鸭'
+      }],
       options: [{
         value: '选项1',
         label: '家具'
@@ -411,6 +432,29 @@ export default {
           key: v.name
         }))
       })
+    },
+    addProductAttribute(row) {
+      this.postForm.productParamsForm.push(this.attributeParam)
+    },
+    deleteProductAttribute(index, rows) {
+      rows.splice(index, 1);
+      console.log( this.postForm.productParamsForm)
+
+    },
+    handleSelectionChange() {
+
+    },
+    handleCheckedCategoryChange() {
+
+    },
+    removeSpecs(item) {
+      let index = this.postForm.product_specs.indexOf(item)
+      if (index !== -1) {
+        this.postForm.product_specs.splice(index, 1)
+      }
+    },
+    toggleShow(index, index2) {
+      this.postForm.product_specs[index].children[index2].isShow = !this.postForm.product_specs[index].children[index2].isShow
     }
   }
 }
@@ -420,7 +464,7 @@ export default {
   @import "src/styles/mixin.scss";
   .title-prompt{
     position: absolute;
-    right: 0px;
+    right: 0;
     font-size: 12px;
     top:10px;
     color:#ff4949;
@@ -457,8 +501,19 @@ export default {
       width: 40px;
       position: absolute;
       right: -10px;
-      top: 0px;
+      top: 0;
     }
+  }
+  .delete-spec{
+    position: relative;
+    top: -65px;
+    right: -111px;
+    cursor: pointer;
+  }
+  .delete-spec-box{
+    font-size: 18px;
+    cursor: pointer;
+    float: right;
   }
 
 </style>
