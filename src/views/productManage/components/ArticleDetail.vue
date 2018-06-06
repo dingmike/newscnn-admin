@@ -28,17 +28,14 @@
         <!--添加 规格-->
         <el-row :gutter="20" style="padding: 12px">
           <el-form-item label="商品规格"></el-form-item>
-          <el-button icon="el-icon-plus" size="mini" plain>添加规格</el-button>
         </el-row>
-
-
         <el-form v-for="(spec,index) in postForm.product_specs" :key="index">
-          <el-card style="margin-bottom: 20px;height: 11rem; background-color: #fff6e4; padding: 6px">
+          <el-card style="margin-bottom: 20px;height: 11rem; background-color: #fff; padding: 6px">
             <el-row>
               <el-col :span="2">
                 <el-form-item>规格名（如：颜色）:</el-form-item>
               </el-col>
-              <el-col :span="3">
+              <el-col :span="3" style="padding: 0 5px">
                 <el-form-item>
                   <el-select v-model="spec.type" filterable placeholder="选择或创建规格名">
                     <el-option
@@ -78,7 +75,7 @@
                     </el-option>
                   </el-select>
                 </el-form-item>
-                <i class="el-icon-error delete-spec" ref="" v-show="specValue.isShow"></i>
+                <i class="el-icon-error delete-spec" ref="" v-show="specValue.isShow" @click="removeSpecValue(index, index2)"></i>
               </el-col>
               <el-col :span="2" style="padding-left: 10px">
                 <el-form-item>
@@ -94,9 +91,12 @@
         </el-form>
 
 
-
+        <el-row :gutter="20" style="padding: 12px">
+          <el-button icon="el-icon-plus" size="mini" @click="addProductSku()" plain>添加规格</el-button>
+        </el-row>
 
         <!--添加规格 end-->
+        <div class="form_divider"></div>
 
         <el-row style="padding: 12px 0">
           商品参数
@@ -433,6 +433,13 @@ export default {
         }))
       })
     },
+    addProductSku() {
+        let obj = {
+          type: '',
+          children: []
+        }
+      this.postForm.product_specs.push(obj)
+    },
     addProductAttribute(row) {
       this.postForm.productParamsForm.push(this.attributeParam)
     },
@@ -452,6 +459,9 @@ export default {
       if (index !== -1) {
         this.postForm.product_specs.splice(index, 1)
       }
+    },
+    removeSpecValue(index, index2) {
+      this.postForm.product_specs[index].children.splice(index2, 1)
     },
     toggleShow(index, index2) {
       this.postForm.product_specs[index].children[index2].isShow = !this.postForm.product_specs[index].children[index2].isShow
