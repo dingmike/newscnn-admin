@@ -37,7 +37,8 @@
               </el-col>
               <el-col :span="4" style="padding: 0 5px">
                 <el-form-item>
-                  <el-select size="small" v-model="spec.type" filterable allow-create placeholder="选择或创建规格名" @change="renderAddSpec(index, spec.type)">
+                  <el-select size="small" v-model="spec.type" filterable allow-create placeholder="选择或创建规格名"
+                             @change="renderAddSpec(index, spec.type)">
                     <el-option
                       v-for="item in productSpecsOptions"
                       :key="item.value"
@@ -64,22 +65,27 @@
               <!--  <div v-for="specValue in spec.children">
                   {{specValue}}
                 </div>-->
-              <el-col style="padding: 0 5px" :span="4" v-for="(specValue, index2) in spec.children" :key="index2" @mouseover.native="toggleShow(index, index2)" @mouseout.native="toggleShow(index, index2)">
+              <el-col style="padding: 0 5px" :span="4" v-for="(specValue, index2) in spec.children" :key="index2"
+                      @mouseover.native="toggleShow(index, index2)" @mouseout.native="toggleShow(index, index2)">
                 <el-form-item>
-                  <el-select size="small" v-model="specValue.value" filterable allow-create placeholder=""  @change="addSpec(spec.children, newSpecName[index], index)">
+                  <el-select size="small" v-model.trim.lazy="specValue.value" filterable allow-create placeholder=""
+                             @change="addSpec(spec.children, specValue.value, index, options)">
                     <el-option
-                      v-for="item in productSpecsOptions"
+                      v-for="item in options"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value">
                     </el-option>
                   </el-select>
                 </el-form-item>
-                <i class="el-icon-error delete-spec" ref="" v-show="specValue.isShow" @click="removeSpecValue(index, index2)"></i>
+                <i class="el-icon-error delete-spec" ref="" v-show="specValue.isShow"
+                   @click="removeSpecValue(index, index2)"></i>
               </el-col>
               <el-col :span="2" style="padding-left: 10px">
                 <el-form-item>
-                  <el-button icon="el-icon-plus" size="mini" @click="addSpecsValue(spec.children, newSpecName[index], index)" plain>添加规格值</el-button>
+                  <el-button icon="el-icon-plus" size="mini"
+                             @click="addSpecsValue(spec.children, newSpecName[index], index)" plain>添加规格值
+                  </el-button>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -104,7 +110,7 @@
         <el-form>
           <el-table :data="tableData" :key='key' border fit highlight-current-row style="width: 100%">
             <!--<el-table-column prop="name" label="fruitName" width="180"></el-table-column>-->
-            <el-table-column :key='fruit' v-for='fruit in formThead' :label="fruit">
+            <el-table-column :key='fruit' v-for='fruit in tableThead' :label="fruit">
               <template slot-scope="scope">
                 {{scope.row[fruit]}}
               </template>
@@ -125,7 +131,6 @@
                     {{ scope.row.prices.marketPrice }}
                   </div>
                 </el-popover>
-
 
 
               </template>
@@ -194,18 +199,10 @@
         </el-form>
 
 
-
-
         <!--规格明细--end-->
 
 
-
-
         <!--添加规格 end-->
-
-
-
-
 
 
         <div class="form_divider"></div>
@@ -261,18 +258,14 @@
                     <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button>
                   </div>
                   <!--<el-button slot="reference">删除</el-button>-->
-                  <el-button slot="reference" type="danger" icon="el-icon-delete"   @click.native.prevent="deleteProductAttribute(scope.$index, postForm.productParamsForm)"></el-button>
+                  <el-button slot="reference" type="danger" icon="el-icon-delete"
+                             @click.native.prevent="deleteProductAttribute(scope.$index, postForm.productParamsForm)"></el-button>
 
                 </el-popover>
               </template>
             </el-table-column>
           </el-table>
         </el-form>
-
-
-
-
-
 
 
         <!--参数列表--end-->
@@ -283,7 +276,7 @@
         <div class="form_divider"></div>
 
         <el-row style="padding: 12px 0">
-           商品详情
+          商品详情
         </el-row>
         <div class="editor-container">
           <tinymce :height=400 ref="editor" v-model="postForm.goods_desc"></tinymce>
@@ -311,467 +304,613 @@
 </template>
 
 <script>
-import Tinymce from '@/components/Tinymce'
-import Upload from '@/components/Upload/mutilImage'
-import MDinput from '@/components/MDinput'
-import Multiselect from 'vue-multiselect'// 使用的一个多选框组件，element-ui的select不能满足所有需求
-import 'vue-multiselect/dist/vue-multiselect.min.css'// 多选框组件css
-import Sticky from '@/components/Sticky' // 粘性header组件
-import { validateURL } from '@/utils/validate'
-import { fetchArticle } from '@/api/article'
-import { userSearch } from '@/api/remoteSearch'
+  import Tinymce from '@/components/Tinymce'
+  import Upload from '@/components/Upload/mutilImage'
+  import MDinput from '@/components/MDinput'
+  import Multiselect from 'vue-multiselect'// 使用的一个多选框组件，element-ui的select不能满足所有需求
+  import 'vue-multiselect/dist/vue-multiselect.min.css'// 多选框组件css
+  import Sticky from '@/components/Sticky' // 粘性header组件
+  import {validateURL} from '@/utils/validate'
+  import {fetchArticle} from '@/api/article'
+  import {userSearch} from '@/api/remoteSearch'
 
-const defaultForm = {
-  status: 'draft',
-  goods_brief: '', // 商品卖点介绍
-  name: '', // 商品标题
-  goods_desc: '', // 商品详情
-  content_short: '', // 文章摘要
-  source_uri: '', // 文章外链
-  primary_pic_url: '', // 商品主要图片
-  source_name: '', // 文章外部作者
-  display_time: undefined, // 前台展示时间
-  id: undefined,
-  product_specs: [{
-    type: '颜色',
-    isShowValue: false,
-    children: [{value: '红',isShow: false}, {value:'蓝', isShow: false}]
-  },
-    {
-      type: '尺寸',
+  const defaultForm = {
+    status: 'draft',
+    goods_brief: '', // 商品卖点介绍
+    name: '', // 商品标题
+    goods_desc: '', // 商品详情
+    content_short: '', // 文章摘要
+    source_uri: '', // 文章外链
+    primary_pic_url: '', // 商品主要图片
+    source_name: '', // 文章外部作者
+    display_time: undefined, // 前台展示时间
+    id: undefined,
+    product_specs: [{
+      type: '颜色',
       isShowValue: false,
-      children: [{value: '大', isShow: false}, {value:'中', isShow: false}]
-    }
-  ],
-  // 注意此项为数组 type Array
-  originalPrices: [{
-    marketPrice: 110,
-    advicePrice: 100,
-    cost: 90,
-    amount: 110
-  }],
-  // 批量填写价格
-  defaultAddPrices: {
-    marketPrice: 100,
-    advicePrice: 90,
-    cost: 80,
-    amount: 50
-  },
-  productParamsForm:[{
-    attribute_category: '家具',
-    attribute_name: '涂漆',
-    attribute_des: '环保涂漆'
-  },{
-    attribute_category: '家具2',
-    attribute_name: '涂漆2',
-    attribute_des: '环保涂漆2'
-  }],
-  platforms: ['a-platform'],
-  comment_disabled: false
-}
-
-export default {
-  name: 'articleDetail',
-  components: { Tinymce, MDinput, Upload, Multiselect, Sticky },
-  props: {
-    isEdit: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data() {
-    const validateRequire = (rule, value, callback) => {
-      if (value === '') {
-        this.$message({
-          message: rule.field + '为必传项',
-          type: 'error'
-        })
-        callback(null)
-      } else {
-        callback()
+      children: [{value: '红', isShow: false}, {value: '蓝', isShow: false}]
+    },
+      {
+        type: '尺寸',
+        isShowValue: false,
+        children: [{value: '大', isShow: false}, {value: '中', isShow: false}]
       }
-    }
-    const validateSourceUri = (rule, value, callback) => {
-      if (value) {
-        if (validateURL(value)) {
-          callback()
-        } else {
+    ],
+    productParamsForm: [{
+      attribute_category: '家具',
+      attribute_name: '涂漆',
+      attribute_des: '环保涂漆'
+    }, {
+      attribute_category: '家具2',
+      attribute_name: '涂漆2',
+      attribute_des: '环保涂漆2'
+    }],
+    platforms: ['a-platform'],
+    comment_disabled: false
+  }
+
+  export default {
+    name: 'articleDetail',
+    components: {Tinymce, MDinput, Upload, Multiselect, Sticky},
+    props: {
+      isEdit: {
+        type: Boolean,
+        default: false
+      }
+    },
+    data() {
+      const validateRequire = (rule, value, callback) => {
+        if (value === '') {
           this.$message({
-            message: '外链url填写不正确',
+            message: rule.field + '为必传项',
             type: 'error'
           })
           callback(null)
+        } else {
+          callback()
         }
-      } else {
-        callback()
       }
-    }
-    return {
-      postForm: Object.assign({}, defaultForm),
-      fetchSuccess: true,
-      loading: false,
-      visible2: false,
-      setAttributeImg: false,
-      isShow: false,
-      isShowValue: false,
-/*      tableData: [
-        {
-          name: 'fruit-1',
-          apple: 'apple-10',
-          banana: 'banana-10',
-          orange: 'orange-10'
-        },
-        {
-          name: 'fruit-2',
-          apple: 'apple-20',
-          banana: 'banana-20',
-          orange: 'orange-20'
-        }
-      ],*/
-      key: 1, // table key
-      formTheadOptions: ['apple', 'banana', 'orange'],
-      checkboxVal: ['apple', 'banana'], // checkboxVal
-      formThead: ['apple', 'banana'],// 默认表头 Default header
-      attributeParam: {
-        attribute_category: '',
-        attribute_name: '',
-        attribute_des: ''
-      },
-      categories: ['居家', '餐厨', '饮食', '配件','服装','杂货'],
-      checkList: [],
-      // 规格种类的数量
-      typesLength: null,
-      enableSpec: null,
-      specPrices: [{
-        specs: ['红', '大'],
-        prices: {
-          marketPrice: 90,
-          advicePrice: 60,
-          cost: 40,
-          amount: 10
-        }
-      },
-        {
-          specs: ['红', '中'],
-          prices: {
-            marketPrice: 30,
-            advicePrice: 70,
-            cost: 30,
-            amount: 10
+      const validateSourceUri = (rule, value, callback) => {
+        if (value) {
+          if (validateURL(value)) {
+            callback()
+          } else {
+            this.$message({
+              message: '外链url填写不正确',
+              type: 'error'
+            })
+            callback(null)
           }
-        },
-        {
-          specs: ['蓝', '大'],
-          prices: {
-            marketPrice: 20,
-            advicePrice: 10,
-            cost: 30,
-            amount: 10
-          }
-        },
-        {
-          specs: ['蓝', '中'],
-          prices: {
-            marketPrice: 50,
-            advicePrice: 40,
-            cost: 30,
-            amount: 10
-          }
+        } else {
+          callback()
         }
-      ],
-      newSpecName: ['', ''],
-      productSpecsOptions: [
+      }
+      return {
+        postForm: Object.assign({}, defaultForm),
+        fetchSuccess: true,
+        loading: false,
+        visible2: false,
+        setAttributeImg: false,
+        isShow: false,
+        isShowValue: false,
+        /*      tableData: [
+         {
+         name: 'fruit-1',
+         apple: 'apple-10',
+         banana: 'banana-10',
+         orange: 'orange-10'
+         },
+         {
+         name: 'fruit-2',
+         apple: 'apple-20',
+         banana: 'banana-20',
+         orange: 'orange-20'
+         }
+         ],*/
+        key: 1, // table key
+        formTheadOptions: ['apple', 'banana', 'orange'],
+        checkboxVal: ['apple', 'banana'], // checkboxVal
+        formThead: ['apple', 'banana'],// 默认表头 Default header
+        attributeParam: {
+          attribute_category: '',
+          attribute_name: '',
+          attribute_des: ''
+        },
+        // 注意此项为数组 type Array
+        originalPrices: [{
+          marketPrice: 110,
+          advicePrice: 100,
+          cost: 90,
+          amount: 110
+        }],
+        // 批量填写价格
+        defaultAddPrices: {
+          marketPrice: 100,
+          advicePrice: 90,
+          cost: 80,
+          amount: 50
+        },
+        categories: ['居家', '餐厨', '饮食', '配件', '服装', '杂货'],
+        checkList: [],
+        // 规格种类的数量
+        typesLength: null,
+        enableSpec: null,
+        // from backend
+        specs: [{
+          type: '颜色',
+          children: ['红', '蓝']
+        },
           {
-        value: '家具',
-        label: '家具'
-      }, {
-        value: '双皮奶',
-        label: '双皮奶'
-      }, {
-        value: '蚵仔煎',
-        label: '蚵仔煎'
-      }, {
-        value: '龙须面',
-        label: '龙须面'
-      }, {
-        value: '北京烤鸭',
-        label: '北京烤鸭'
-      }],
-      options: [{
-        value: '选项1',
-        label: '家具'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }, {
-        value: '选项3',
-        label: '蚵仔煎'
-      }, {
-        value: '选项4',
-        label: '龙须面'
-      }, {
-        value: '选项5',
-        label: '北京烤鸭'
-      }],
-      userLIstOptions: [],
-      platformsOptions: [
-        { key: 'a-platform', name: 'a-platform' },
-        { key: 'b-platform', name: 'b-platform' },
-        { key: 'c-platform', name: 'c-platform' }
-      ],
-      rules: {
-        title: [
-          { required: true, message: '请输入商品标题', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 50 个字符', trigger: 'blur' }
+            type: '尺寸',
+            children: ['大', '中']
+          }
         ],
-        introduce: [
-          { required: true, message: '请输入卖点介绍', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 50 个字符', trigger: 'blur' }
+        specPrices: [{
+          specs: ['红', '大'],
+          prices: {
+            marketPrice: 90,
+            advicePrice: 60,
+            cost: 40,
+            amount: 10
+          }
+        },
+          {
+            specs: ['红', '中'],
+            prices: {
+              marketPrice: 30,
+              advicePrice: 70,
+              cost: 30,
+              amount: 10
+            }
+          },
+          {
+            specs: ['蓝', '大'],
+            prices: {
+              marketPrice: 20,
+              advicePrice: 10,
+              cost: 30,
+              amount: 10
+            }
+          },
+          {
+            specs: ['蓝', '中'],
+            prices: {
+              marketPrice: 50,
+              advicePrice: 40,
+              cost: 30,
+              amount: 10
+            }
+          }
         ],
-        region: [
-          { required: true, message: '请选择活动区域', trigger: 'change' }
+        newSpecName: ['', ''],
+        productSpecsOptions: [
+          {
+            value: '家具',
+            label: '家具'
+          }, {
+            value: '尺寸',
+            label: '尺寸'
+          }, {
+            value: '双皮奶',
+            label: '双皮奶'
+          }, {
+            value: '蚵仔煎',
+            label: '蚵仔煎'
+          }, {
+            value: '龙须面',
+            label: '龙须面'
+          }, {
+            value: '北京烤鸭',
+            label: '北京烤鸭'
+          },
+          {
+            value: '颜色',
+            label: '颜色'
+          }],
+        options: [{
+          value: 'M',
+          label: 'M'
+        }, {
+          value: 'L',
+          label: 'L'
+        }, {
+          value: 'XL',
+          label: 'XL'
+        }, {
+          value: 'S',
+          label: 'S'
+        }, {
+          value: '红色',
+          label: '红色'
+        },
+          {
+            value: '绿色',
+            label: '绿色'
+          }
         ],
-        date1: [
-          { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+        userLIstOptions: [],
+        platformsOptions: [
+          {key: 'a-platform', name: 'a-platform'},
+          {key: 'b-platform', name: 'b-platform'},
+          {key: 'c-platform', name: 'c-platform'}
         ],
-        date2: [
-          { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
-        ],
-        type: [
-          { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
-        ],
-        resource: [
-          { required: true, message: '请选择活动资源', trigger: 'change' }
-        ],
-        desc: [
-          { required: true, message: '请填写活动形式', trigger: 'blur' }
-        ]
+        rules: {
+          title: [
+            {required: true, message: '请输入商品标题', trigger: 'blur'},
+            {min: 3, max: 5, message: '长度在 3 到 50 个字符', trigger: 'blur'}
+          ],
+          introduce: [
+            {required: true, message: '请输入卖点介绍', trigger: 'blur'},
+            {min: 3, max: 5, message: '长度在 3 到 50 个字符', trigger: 'blur'}
+          ],
+          region: [
+            {required: true, message: '请选择活动区域', trigger: 'change'}
+          ],
+          date1: [
+            {type: 'date', required: true, message: '请选择日期', trigger: 'change'}
+          ],
+          date2: [
+            {type: 'date', required: true, message: '请选择时间', trigger: 'change'}
+          ],
+          type: [
+            {type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change'}
+          ],
+          resource: [
+            {required: true, message: '请选择活动资源', trigger: 'change'}
+          ],
+          desc: [
+            {required: true, message: '请填写活动形式', trigger: 'blur'}
+          ]
 
 //
 //        image_uri: [{ validator: validateRequire }],
 //        title: [{ validator: validateRequire }],
 //        content: [{ validator: validateRequire }],
 //        source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
+        }
       }
-    }
-  },
-  watch: {
-    checkboxVal(valArr) {
-      this.formThead = this.formTheadOptions.filter(i => valArr.indexOf(i) >= 0)
-      this.key = this.key + 1// 为了保证table 每次都会重渲 In order to ensure the table will be re-rendered each time
-    }
-  },
-  computed: {
-    contentShortLength() {
-      return this.postForm.content_short.length
     },
-    // 表格数据
-    tableData() {
-      var arr = this.specPrices;
-      console.log(arr)
-      for (var i = 0; i < arr.length; i++) {
-        arr[i].spec0 = arr[i].specs[0]
-        arr[i].spec1 = arr[i].specs[1]
+    watch: {
+      checkboxVal(valArr) {
+        this.formThead = this.formTheadOptions.filter(i => valArr.indexOf(i) >= 0)
+        this.key = this.key + 1// 为了保证table 每次都会重渲 In order to ensure the table will be re-rendered each time
       }
-      // console.log(this.mySpecPrices)
-      return arr
-    }
-  },
-  created() {
-    if (this.isEdit) {
-      this.fetchData()
-    } else {
-      this.postForm = Object.assign({}, defaultForm)
-    }
+    },
+    computed: {
+      contentShortLength() {
+        return this.postForm.content_short.length
+      },
+      // 表格数据
+      tableData() {
+        debugger
+        var arr = this.specPrices;
+        console.log(arr)
+        for (var i = 0; i < arr.length; i++) {
+          arr[i].spec0 = arr[i].specs[0]
+          arr[i].spec1 = arr[i].specs[1]
+        }
+        // console.log(this.mySpecPrices)
+        return arr
+      },
+      // 规格表头数据
+      tableThead() {
+        let specs = this.postForm.product_specs
+        let arr = []
+        for (let i = 0; i < specs.length; i++) {
+          arr.push(specs[i].type)
+        }
+        return arr
+      }
+    },
+    created() {
+      if (this.isEdit) {
+        this.fetchData()
+      } else {
+        this.postForm = Object.assign({}, defaultForm)
+      }
 
 // 规格
-    this.specs = this._specs
-    this.specs = []
-    this.specPrices = []
+      this.specs = this._specs
+      this.specs = []
+      this.specPrices = []
 
-    if (this.specs.length == 0) {
-      // 初始化规格数据
-      var obj = {}
-      obj.type = "";
-      obj.children = []
-      this.specs.push(obj)
-      // console.log(this.specs)
+      if (this.specs.length == 0) {
+        // 初始化规格数据
+        let obj = {}
+        obj.type = "";
+        obj.children = []
+        this.specs.push(obj)
+        // console.log(this.specs)
 
-      // 初始化价格数据
-      var _obj = [{}]
-      _obj[0].specs = ['']
-      _obj[0].prices = {
-        marketPrice: 0,
-        advicePrice: 0,
-        cost: 0,
-        amount: 0
-      }
-      this.specPrices = _obj
-    }
-
-    this.typesLength = this.specs.length
-    this.enableSpec = this.typesLength ? true : false
-
-    this.enableSpec = false
-
-    console.log(this.enableSpec)
-    console.log(this.typesLength)
-    console.log(this.specCombinations)
-    console.log('this.specCombinations')
-
-    if (this.typesLength === 2) {
-      this.typeName1 = this.goodsData[0].type
-      this.typeName2 = this.goodsData[0].type
-    }
-
-
-  },
-  methods: {
-    fetchData() {
-      fetchArticle().then(response => {
-        this.postForm = response.data
-      }).catch(err => {
-        this.fetchSuccess = false
-        console.log(err)
-      })
-    },
-    submitForm() {
-      this.postForm.display_time = parseInt(this.display_time / 1000)
-      console.log(this.postForm)
-      this.$refs.postForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$notify({
-            title: '成功',
-            message: '发布文章成功',
-            type: 'success',
-            duration: 2000
-          })
-          this.postForm.status = 'published'
-          this.loading = false
-        } else {
-          console.log('error submit!!')
-          return false
+        // 初始化价格数据
+        let _obj = [{}]
+        _obj[0].specs = ['']
+        _obj[0].prices = {
+          marketPrice: 0,
+          advicePrice: 0,
+          cost: 0,
+          amount: 0
         }
-      })
-    },
-    draftForm() {
-      if (this.postForm.content.length === 0 || this.postForm.title.length === 0) {
-        this.$message({
-          message: '请填写必要的标题和内容',
-          type: 'warning'
-        })
-        return
+        this.specPrices = _obj
       }
-      this.$message({
-        message: '保存成功',
-        type: 'success',
-        showClose: true,
-        duration: 1000
-      })
-      this.postForm.status = 'draft'
+
+      this.typesLength = this.specs.length
+      this.enableSpec = this.typesLength ? true : false
+
+      this.enableSpec = false
+
+      console.log(this.enableSpec)
+      console.log(this.typesLength)
+      console.log(this.specCombinations)
+      console.log('this.specCombinations')
+
+      if (this.typesLength === 2) {
+        this.typeName1 = this.goodsData[0].type
+        this.typeName2 = this.goodsData[0].type
+      }
+
+
     },
-    getRemoteUserList(query) {
-      userSearch(query).then(response => {
-        if (!response.data.items) return
-        console.log(response)
-        this.userLIstOptions = response.data.items.map(v => ({
-          key: v.name
-        }))
-      })
-    },
-    addProductSku() {
+    methods: {
+      fetchData() {
+        fetchArticle().then(response => {
+          this.postForm = response.data
+        }).catch(err => {
+          this.fetchSuccess = false
+          console.log(err)
+        })
+      },
+      submitForm() {
+        this.postForm.display_time = parseInt(this.display_time / 1000)
+        console.log(this.postForm)
+        this.$refs.postForm.validate(valid => {
+          if (valid) {
+            this.loading = true
+            this.$notify({
+              title: '成功',
+              message: '发布文章成功',
+              type: 'success',
+              duration: 2000
+            })
+            this.postForm.status = 'published'
+            this.loading = false
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      draftForm() {
+        if (this.postForm.content.length === 0 || this.postForm.title.length === 0) {
+          this.$message({
+            message: '请填写必要的标题和内容',
+            type: 'warning'
+          })
+          return
+        }
+        this.$message({
+          message: '保存成功',
+          type: 'success',
+          showClose: true,
+          duration: 1000
+        })
+        this.postForm.status = 'draft'
+      },
+      getRemoteUserList(query) {
+        userSearch(query).then(response => {
+          if (!response.data.items) return
+          console.log(response)
+          this.userLIstOptions = response.data.items.map(v => ({
+            key: v.name
+          }))
+        })
+      },
+      addProductSku() {
         let obj = {
           type: '',
           children: []
         }
-      this.postForm.product_specs.push(obj)
-    },
-    addProductAttribute(row) {
-      this.postForm.productParamsForm.push(this.attributeParam)
-    },
-    deleteProductAttribute(index, rows) {
-      rows.splice(index, 1);
-      console.log( this.postForm.productParamsForm)
+        this.postForm.product_specs.push(obj)
+      },
+      addProductAttribute(row) {
+        this.postForm.productParamsForm.push(this.attributeParam)
+      },
+      deleteProductAttribute(index, rows) {
+        rows.splice(index, 1);
+        console.log(this.postForm.productParamsForm)
 
-    },
-    handleSelectionChange() {
+      },
+      handleSelectionChange() {
 
-    },
-    handleCheckedCategoryChange() {
+      },
+      handleCheckedCategoryChange() {
 
-    },
-    addSpecsValue(spec, newSpecName, index) {
+      },
+      modiSpec(specName, spec, index) {
+        spec[index] = specName;
+        console.log(this.specs)
+      },
+      addSpec(spec, newSpecName, index, options) {
         debugger
+        let obj = {value: '', isShow: false}
+        Array.prototype.indexOfObj = function (val) {
+          for (var i = 0; i < this.length; i++) {
+            if (this[i].value == val.value) return i;
+          }
+          return -1;
+        };
+        console.log(newSpecName + '111')
+        let specValueOptionObj = {value: newSpecName, label: newSpecName}
+        debugger
+//      this.productSpecsOptions.remove(specValueOptionObj)
+        console.log(options)
+
+        console.log(options.indexOfObj(specValueOptionObj))
+
+        options.splice(options.indexOfObj(specValueOptionObj), 1)
 
 
-      console.log(newSpecName + '111')
-      // 检测新规格名是否规范 1, 不为空. 2,不重复
-      if (!newSpecName) {
-        alert('规格项名称不能为空')
-        let obj = {value: '',isShow: false}
+        // 检测新规格名是否规范 1, 不为空. 2,不重复
+        if (!newSpecName) {
+          alert('规格项名称不能为空')
+          return
+        }
+        obj.value = newSpecName
+        /*if(obj.value){
+         spec.push(obj)
+         }*/
+
+        console.log(spec)
+        console.log(this.postForm.product_specs)
+
+        // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
+        var myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+        var specCombinations = this.specCombinations()
+        this.mySpecPrices(specCombinations, myDefaultAddPrices)
+
+//      this.newSpecName[index] = ''
+//       console.log(this.specs)
+      },
+      addSpecsValue(spec, newSpecName, index) {
+        debugger
+        let obj = {value: '', isShow: false}
+//      if (!newSpecName) {
+//        alert('规格项名称不能为空')
+//        return
+//      } else if (spec.includes(newSpecName)) {
+//        alert('规格项名称不能为重复')
+//        return
+//      }
         this.postForm.product_specs[index].children.push(obj)
-        return
-      } else if (spec.includes(newSpecName)) {
-        alert('规格项名称不能为重复')
-        return
-      }
-      spec.push(newSpecName)
-      console.log(spec)
 
-      // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
-      var myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
-      var specCombinations = this.specCombinations()
-      this.mySpecPrices(specCombinations, myDefaultAddPrices)
-
-      this.newSpecName[index] = ''
-      // console.log(this.specs)
-
-
-
-    },
-    removeSpecs(item) {
-      let index = this.postForm.product_specs.indexOf(item)
-      if (index !== -1) {
-        this.postForm.product_specs.splice(index, 1)
-      }
-    },
-    removeSpecValue(index, index2) {
+      },
+      removeSpecs(item) {
+        let index = this.postForm.product_specs.indexOf(item)
+        if (index !== -1) {
+          this.postForm.product_specs.splice(index, 1)
+        }
+      },
+      removeSpecValue(index, index2) {
         debugger
-      this.postForm.product_specs[index].children.splice(index2, 1)
-    },
-    toggleShow(index, index2) {
+        this.postForm.product_specs[index].children.splice(index2, 1)
+      },
+      toggleShow(index, index2) {
+        this.postForm.product_specs[index].children[index2].isShow = !this.postForm.product_specs[index].children[index2].isShow
+      },
+      renderAddSpec(index, newSpecName) {
         debugger
-      this.postForm.product_specs[index].children[index2].isShow = !this.postForm.product_specs[index].children[index2].isShow
-    },
-    renderAddSpec(index, newSpecName) {
-      debugger
-      console.log('specType: '  + newSpecName)
-      this.postForm.product_specs[index].isShowValue = true
+        console.log('specType: ' + newSpecName)
+        this.postForm.product_specs[index].isShowValue = true
+        this.postForm.product_specs[index].children.length = 0
+        this.formThead.length = 0
+        this.formThead.push(newSpecName)
 
-      this.formThead.length = 0
-      this.formThead.push(newSpecName)
-
-
-
-
-
-
-
+//      渲染一个默认规格值输入框
+        let obj = {value: '', isShow: false}
+        this.postForm.product_specs[index].children.push(obj)
+      },
+      // 规格组合数组
+      specCombinations() {
+        debugger
+        console.log(this.postForm.product_specs)
+        var arrWra = [];
+        // 有2个规格type  children: [{value: '红',isShow: false}, {value:'蓝', isShow: false}]
+        if (this.postForm.product_specs.length == 2) {
+          var arr1 = this.postForm.product_specs[0].children
+          var arr2 = this.postForm.product_specs[1].children
+          // 判断arr1是否为[], 如果是 为其添加个空字符串占位
+          if (arr1.length == 0) {
+            arr1 = ['']
+          }
+          if (arr2.length == 0) {
+            arr2 = ['']
+          }
+          var arr = []
+          for (var t = 0; t < arr1.length; t++) {
+            for (var i = 0; i < arr2.length; i++) {
+              arr = []
+              arr.push(arr1[t].value)
+              arr.push(arr2[i].value)
+              arrWra.push(arr)
+            }
+          }
+          console.log(arrWra)
+          return arrWra
+          // 只有1个规格type
+        } else if (this.postForm.product_specs.length == 1) {
+          var arr = this.postForm.product_specs[0].children
+          if (arr.length == 0) {
+            arr = ['']
+          }
+          for (var i = 0; i < arr.length; i++) {
+            var _arr = []
+            _arr.push(arr[i].value)
+            arrWra.push(_arr)
+          }
+          debugger
+          console.log(arrWra)
+          console.log('arrWra hehe............')
+          return arrWra
+        }
+      },
+      // 规格价格数据 local
+      // 数据更新
+      mySpecPrices(specCombinations, myDefaultAddPrices) {
+        debugger
+        // function sameSpecs(element) {
+        //   return element.specs == arr[i];
+        // }
+        var arrWra = []
+        // 规格组合 数组
+        var arr = specCombinations
+        console.log(arr)
+        for (var i = 0; i < arr.length; i++) {
+          // 新增 规格价格 项
+          var obj = {};
+          obj.specs = arr[i];
+          // !注意 a类型为数组
+          // 对比 新的 规格组合数组 与原价格数组
+          var oldItem = this.specPrices.filter((element) => {
+            return element.specs + "" === arr[i] + "";
+          })
+          var newItem = this.specPrices.filter((element) => {
+            return element.specs + "" != arr[i] + "";
+          })
+          // 注意这里用的是length因为 空数组,空对象的布尔值为true
+          // 旧规各项价格
+          if (oldItem.length) {
+            obj.prices = oldItem[0].prices
+            console.log(oldItem[0])
+            // 新规各项价格
+          } else {
+            console.log(newItem)
+            console.log('_____')
+            // if (newItem.length != 0) {
+            // 这里用深拷贝否则各新项目的价格数据会关联
+            newItem[0].prices = JSON.parse(JSON.stringify(myDefaultAddPrices));
+            obj.prices = newItem[0].prices
+            // }
+          }
+          arrWra.push(obj)
+        }
+        console.log(arrWra)
+        this.specPrices = arrWra
+      }
     }
   }
-}
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
   @import "src/styles/mixin.scss";
-  .title-prompt{
+
+  .title-prompt {
     position: absolute;
     right: 0;
     font-size: 12px;
-    top:10px;
-    color:#ff4949;
+    top: 10px;
+    color: #ff4949;
   }
+
   .createPost-container {
     position: relative;
     .createPost-main-container {
@@ -788,11 +927,11 @@ export default {
         min-height: 500px;
         margin: 0 0 30px;
         .editor-upload-btn-container {
-            text-align: right;
-            margin-right: 10px;
-            .editor-upload-btn {
-                display: inline-block;
-            }
+          text-align: right;
+          margin-right: 10px;
+          .editor-upload-btn {
+            display: inline-block;
+          }
         }
       }
       .form_divider {
@@ -807,13 +946,15 @@ export default {
       top: 0;
     }
   }
-  .delete-spec{
+
+  .delete-spec {
     position: relative;
     top: -4rem;
     right: -10rem;
     cursor: pointer;
   }
-  .delete-spec-box{
+
+  .delete-spec-box {
     font-size: 20px;
     cursor: pointer;
     float: right;
