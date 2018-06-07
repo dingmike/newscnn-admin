@@ -37,7 +37,7 @@
               </el-col>
               <el-col :span="4" style="padding: 0 5px">
                 <el-form-item>
-                  <el-select size="small" v-model="spec.type" filterable allow-create placeholder="选择或创建规格名" @change="renderAddSpec(index)">
+                  <el-select size="small" v-model="spec.type" filterable allow-create placeholder="选择或创建规格名" @change="renderAddSpec(index, spec.type)">
                     <el-option
                       v-for="item in productSpecsOptions"
                       :key="item.value"
@@ -66,7 +66,7 @@
                 </div>-->
               <el-col style="padding: 0 5px" :span="4" v-for="(specValue, index2) in spec.children" :key="index2" @mouseover.native="toggleShow(index, index2)" @mouseout.native="toggleShow(index, index2)">
                 <el-form-item>
-                  <el-select size="small" v-model="specValue.value" filterable allow-create placeholder="" >
+                  <el-select size="small" v-model="specValue.value" filterable allow-create placeholder=""  @change="addSpec(spec.children, newSpecName[index], index)">
                     <el-option
                       v-for="item in productSpecsOptions"
                       :key="item.value"
@@ -79,7 +79,7 @@
               </el-col>
               <el-col :span="2" style="padding-left: 10px">
                 <el-form-item>
-                  <el-button icon="el-icon-plus" size="mini" @click="addSpecsValue(index)" plain>添加规格值</el-button>
+                  <el-button icon="el-icon-plus" size="mini" @click="addSpecsValue(spec.children, newSpecName[index], index)" plain>添加规格值</el-button>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -103,10 +103,91 @@
         </el-row>
         <el-form>
           <el-table :data="tableData" :key='key' border fit highlight-current-row style="width: 100%">
-            <el-table-column prop="name" label="fruitName" width="180"></el-table-column>
+            <!--<el-table-column prop="name" label="fruitName" width="180"></el-table-column>-->
             <el-table-column :key='fruit' v-for='fruit in formThead' :label="fruit">
               <template slot-scope="scope">
                 {{scope.row[fruit]}}
+              </template>
+            </el-table-column>
+            <el-table-column prop="" label="货号">
+              <template slot-scope="scope">
+                <!--<el-input v-model="postForm.name"></el-input>-->
+
+                <el-popover trigger="click" placement="top">
+                  <p>货号:
+                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.marketPrice"></el-input>
+                  </p>
+                  <div style="text-align: right; margin: 0">
+                    <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
+                    <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
+                  </div>
+                  <div slot="reference" class="name-wrapper">
+                    {{ scope.row.prices.marketPrice }}
+                  </div>
+                </el-popover>
+
+
+
+              </template>
+            </el-table-column>
+            <el-table-column prop="" label="*现价">
+              <template slot-scope="scope">
+                <!--<el-input v-model="postForm.name"></el-input>-->
+
+                <el-popover trigger="click" placement="top">
+                  <p>现价:
+                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.advicePrice"></el-input>
+                  </p>
+                  <div style="text-align: right; margin: 0">
+                    <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
+                    <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
+                  </div>
+                  <div slot="reference" class="name-wrapper">
+                    {{ scope.row.prices.advicePrice }}
+                  </div>
+                </el-popover>
+
+              </template>
+            </el-table-column>
+            <el-table-column prop="" label="*原价">
+              <template slot-scope="scope">
+                <!--<el-input v-model="postForm.name"></el-input>-->
+                <el-popover trigger="click" placement="top">
+                  <p>原价:
+                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.amount"></el-input>
+                  </p>
+                  <div style="text-align: right; margin: 0">
+                    <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
+                    <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
+                  </div>
+                  <div slot="reference" class="name-wrapper">
+                    {{ scope.row.prices.amount }}
+                  </div>
+                </el-popover>
+              </template>
+            </el-table-column>
+            <el-table-column prop="" label="*库存">
+              <template slot-scope="scope">
+                <!--<el-input v-model="postForm.name"></el-input>-->
+
+                <el-popover trigger="click" placement="top">
+                  <p>原价:
+                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.amount"></el-input>
+                  </p>
+                  <div style="text-align: right; margin: 0">
+                    <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
+                    <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
+                  </div>
+                  <div slot="reference" class="name-wrapper">
+                    {{ scope.row.prices.amount }}
+                  </div>
+                </el-popover>
+
+              </template>
+            </el-table-column>
+            <el-table-column prop="" label="*图片">
+              <template slot-scope="scope">
+                <Upload v-model="postForm.primary_pic_url"></Upload>
               </template>
             </el-table-column>
           </el-table>
@@ -262,6 +343,20 @@ const defaultForm = {
       children: [{value: '大', isShow: false}, {value:'中', isShow: false}]
     }
   ],
+  // 注意此项为数组 type Array
+  originalPrices: [{
+    marketPrice: 110,
+    advicePrice: 100,
+    cost: 90,
+    amount: 110
+  }],
+  // 批量填写价格
+  defaultAddPrices: {
+    marketPrice: 100,
+    advicePrice: 90,
+    cost: 80,
+    amount: 50
+  },
   productParamsForm:[{
     attribute_category: '家具',
     attribute_name: '涂漆',
@@ -319,7 +414,7 @@ export default {
       setAttributeImg: false,
       isShow: false,
       isShowValue: false,
-      tableData: [
+/*      tableData: [
         {
           name: 'fruit-1',
           apple: 'apple-10',
@@ -332,7 +427,7 @@ export default {
           banana: 'banana-20',
           orange: 'orange-20'
         }
-      ],
+      ],*/
       key: 1, // table key
       formTheadOptions: ['apple', 'banana', 'orange'],
       checkboxVal: ['apple', 'banana'], // checkboxVal
@@ -344,21 +439,62 @@ export default {
       },
       categories: ['居家', '餐厨', '饮食', '配件','服装','杂货'],
       checkList: [],
+      // 规格种类的数量
+      typesLength: null,
+      enableSpec: null,
+      specPrices: [{
+        specs: ['红', '大'],
+        prices: {
+          marketPrice: 90,
+          advicePrice: 60,
+          cost: 40,
+          amount: 10
+        }
+      },
+        {
+          specs: ['红', '中'],
+          prices: {
+            marketPrice: 30,
+            advicePrice: 70,
+            cost: 30,
+            amount: 10
+          }
+        },
+        {
+          specs: ['蓝', '大'],
+          prices: {
+            marketPrice: 20,
+            advicePrice: 10,
+            cost: 30,
+            amount: 10
+          }
+        },
+        {
+          specs: ['蓝', '中'],
+          prices: {
+            marketPrice: 50,
+            advicePrice: 40,
+            cost: 30,
+            amount: 10
+          }
+        }
+      ],
+      newSpecName: ['', ''],
       productSpecsOptions: [
           {
-        value: '选项1',
+        value: '家具',
         label: '家具'
       }, {
-        value: '选项2',
+        value: '双皮奶',
         label: '双皮奶'
       }, {
-        value: '选项3',
+        value: '蚵仔煎',
         label: '蚵仔煎'
       }, {
-        value: '选项4',
+        value: '龙须面',
         label: '龙须面'
       }, {
-        value: '选项5',
+        value: '北京烤鸭',
         label: '北京烤鸭'
       }],
       options: [{
@@ -428,6 +564,17 @@ export default {
   computed: {
     contentShortLength() {
       return this.postForm.content_short.length
+    },
+    // 表格数据
+    tableData() {
+      var arr = this.specPrices;
+      console.log(arr)
+      for (var i = 0; i < arr.length; i++) {
+        arr[i].spec0 = arr[i].specs[0]
+        arr[i].spec1 = arr[i].specs[1]
+      }
+      // console.log(this.mySpecPrices)
+      return arr
     }
   },
   created() {
@@ -436,6 +583,48 @@ export default {
     } else {
       this.postForm = Object.assign({}, defaultForm)
     }
+
+// 规格
+    this.specs = this._specs
+    this.specs = []
+    this.specPrices = []
+
+    if (this.specs.length == 0) {
+      // 初始化规格数据
+      var obj = {}
+      obj.type = "";
+      obj.children = []
+      this.specs.push(obj)
+      // console.log(this.specs)
+
+      // 初始化价格数据
+      var _obj = [{}]
+      _obj[0].specs = ['']
+      _obj[0].prices = {
+        marketPrice: 0,
+        advicePrice: 0,
+        cost: 0,
+        amount: 0
+      }
+      this.specPrices = _obj
+    }
+
+    this.typesLength = this.specs.length
+    this.enableSpec = this.typesLength ? true : false
+
+    this.enableSpec = false
+
+    console.log(this.enableSpec)
+    console.log(this.typesLength)
+    console.log(this.specCombinations)
+    console.log('this.specCombinations')
+
+    if (this.typesLength === 2) {
+      this.typeName1 = this.goodsData[0].type
+      this.typeName2 = this.goodsData[0].type
+    }
+
+
   },
   methods: {
     fetchData() {
@@ -512,9 +701,34 @@ export default {
     handleCheckedCategoryChange() {
 
     },
-    addSpecsValue(index) {
-      let obj = {value: '',isShow: false}
-      this.postForm.product_specs[index].children.push(obj)
+    addSpecsValue(spec, newSpecName, index) {
+        debugger
+
+
+      console.log(newSpecName + '111')
+      // 检测新规格名是否规范 1, 不为空. 2,不重复
+      if (!newSpecName) {
+        alert('规格项名称不能为空')
+        let obj = {value: '',isShow: false}
+        this.postForm.product_specs[index].children.push(obj)
+        return
+      } else if (spec.includes(newSpecName)) {
+        alert('规格项名称不能为重复')
+        return
+      }
+      spec.push(newSpecName)
+      console.log(spec)
+
+      // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
+      var myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+      var specCombinations = this.specCombinations()
+      this.mySpecPrices(specCombinations, myDefaultAddPrices)
+
+      this.newSpecName[index] = ''
+      // console.log(this.specs)
+
+
+
     },
     removeSpecs(item) {
       let index = this.postForm.product_specs.indexOf(item)
@@ -523,14 +737,27 @@ export default {
       }
     },
     removeSpecValue(index, index2) {
+        debugger
       this.postForm.product_specs[index].children.splice(index2, 1)
     },
     toggleShow(index, index2) {
+        debugger
       this.postForm.product_specs[index].children[index2].isShow = !this.postForm.product_specs[index].children[index2].isShow
     },
-    renderAddSpec(index) {
+    renderAddSpec(index, newSpecName) {
       debugger
+      console.log('specType: '  + newSpecName)
       this.postForm.product_specs[index].isShowValue = true
+
+      this.formThead.length = 0
+      this.formThead.push(newSpecName)
+
+
+
+
+
+
+
     }
   }
 }
