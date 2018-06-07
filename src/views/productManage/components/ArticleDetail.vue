@@ -79,12 +79,12 @@
                   </el-select>
                 </el-form-item>
                 <i class="el-icon-error delete-spec" ref="" v-show="specValue.isShow"
-                   @click="removeSpecValue(index, index2)"></i>
+                   @click="removeSpecValue(index, index2, specValue.value, options)"></i>
               </el-col>
               <el-col :span="2" style="padding-left: 10px">
                 <el-form-item>
                   <el-button icon="el-icon-plus" size="mini"
-                             @click="addSpecsValue(spec.children, newSpecName[index], index)" plain>添加规格值
+                             @click="addSpecsValue(spec.children, newSpecName[index], index, options)" plain>添加规格值
                   </el-button>
                 </el-form-item>
               </el-col>
@@ -733,7 +733,7 @@
       addSpec(spec, newSpecName, index, options) {
         debugger
         let obj = {value: '', isShow: false}
-        Array.prototype.indexOfObj = function (val) {
+     /*   Array.prototype.indexOfObj = function (val) {
           for (var i = 0; i < this.length; i++) {
             if (this[i].value == val.value) return i;
           }
@@ -747,7 +747,8 @@
 
         console.log(options.indexOfObj(specValueOptionObj))
 
-        options.splice(options.indexOfObj(specValueOptionObj), 1)
+        options.splice(options.indexOfObj(specValueOptionObj), 1)*/
+
 
 
         // 检测新规格名是否规范 1, 不为空. 2,不重复
@@ -767,13 +768,29 @@
         var myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
         var specCombinations = this.specCombinations()
         this.mySpecPrices(specCombinations, myDefaultAddPrices)
-
 //      this.newSpecName[index] = ''
 //       console.log(this.specs)
       },
-      addSpecsValue(spec, newSpecName, index) {
+      addSpecsValue(spec, newSpecName, index, options) {
         debugger
         let obj = {value: '', isShow: false}
+
+        // 删除已选择规格值，防止重复选择
+        Array.prototype.indexOfObj = function (val) {
+          for (var i = 0; i < this.length; i++) {
+            if (this[i].value == val.value) return i;
+          }
+          return -1;
+        };
+        let specValueOptionObj = {value: spec[spec.length-1].value, label: spec[spec.length-1].value}
+        debugger
+        console.log(options)
+
+        console.log(options.indexOfObj(specValueOptionObj))
+
+        options.splice(options.indexOfObj(specValueOptionObj), 1)
+
+
 //      if (!newSpecName) {
 //        alert('规格项名称不能为空')
 //        return
@@ -790,9 +807,15 @@
           this.postForm.product_specs.splice(index, 1)
         }
       },
-      removeSpecValue(index, index2) {
+      removeSpecValue(index, index2, specValue, options) {
         debugger
         this.postForm.product_specs[index].children.splice(index2, 1)
+        // 删除规格值恢复规格值的下拉选项个数
+       /* let specValueOptionObj = {value: specValue, label: specValue}
+        if(specValueOptionObj.value){
+          options.push(specValueOptionObj)
+        }*/
+
       },
       toggleShow(index, index2) {
         this.postForm.product_specs[index].children[index2].isShow = !this.postForm.product_specs[index].children[index2].isShow
@@ -815,7 +838,51 @@
         console.log(this.postForm.product_specs)
         var arrWra = [];
         // 有2个规格type  children: [{value: '红',isShow: false}, {value:'蓝', isShow: false}]
-        if (this.postForm.product_specs.length == 2) {
+        if (this.postForm.product_specs.length == 3) {
+          var arr1 = this.postForm.product_specs[0].children
+          var arr2 = this.postForm.product_specs[1].children
+          var arr3 = this.postForm.product_specs[2].children
+          // 判断arr1是否为[], 如果是 为其添加个空字符串占位
+          if (arr1.length == 0) {
+            arr1 = ['']
+          }
+          if (arr2.length == 0) {
+            arr2 = ['']
+          }
+          if (arr3.length == 0) {
+            arr3 = ['']
+          }
+          var arr = []
+          for (var t = 0; t < arr1.length; t++) {
+            for (var i = 0; i < arr2.length; i++) {
+                for(var m = 0; m< arr3.length; m++){
+                  arr = []
+                  arr.push(arr1[t].value)
+                  arr.push(arr2[i].value)
+                  arr.push(arr3[m].value)
+                  arrWra.push(arr)
+                }
+
+            }
+          }
+          console.log(arrWra)
+          return arrWra
+          // 只有1个规格type
+        } else if (this.postForm.product_specs.length == 1) {
+          var arr = this.postForm.product_specs[0].children
+          if (arr.length == 0) {
+            arr = ['']
+          }
+          for (var i = 0; i < arr.length; i++) {
+            var _arr = []
+            _arr.push(arr[i].value)
+            arrWra.push(_arr)
+          }
+          debugger
+          console.log(arrWra)
+          console.log('arrWra hehe............')
+          return arrWra
+        }else if(this.postForm.product_specs.length == 2){
           var arr1 = this.postForm.product_specs[0].children
           var arr2 = this.postForm.product_specs[1].children
           // 判断arr1是否为[], 如果是 为其添加个空字符串占位
@@ -835,21 +902,6 @@
             }
           }
           console.log(arrWra)
-          return arrWra
-          // 只有1个规格type
-        } else if (this.postForm.product_specs.length == 1) {
-          var arr = this.postForm.product_specs[0].children
-          if (arr.length == 0) {
-            arr = ['']
-          }
-          for (var i = 0; i < arr.length; i++) {
-            var _arr = []
-            _arr.push(arr[i].value)
-            arrWra.push(_arr)
-          }
-          debugger
-          console.log(arrWra)
-          console.log('arrWra hehe............')
           return arrWra
         }
       },
