@@ -782,13 +782,21 @@
           }
           return -1;
         };
-        let specValueOptionObj = {value: spec[spec.length-1].value, label: spec[spec.length-1].value}
+        let newObj = {value: '', label: ''}
+        for(let n = 0; n < options.length; n ++){
+           for(let i = 0; i < spec.length; i++){
+               if(options[n].value === spec[i].value){
+                 newObj.value = spec[i].value
+                 newObj.label = spec[i].value
+               }
+           }
+        }
         debugger
         console.log(options)
 
-        console.log(options.indexOfObj(specValueOptionObj))
+        console.log(options.indexOfObj(newObj))
 
-        options.splice(options.indexOfObj(specValueOptionObj), 1)
+        options.splice(options.indexOfObj(newObj), 1)
 
 
 //      if (!newSpecName) {
