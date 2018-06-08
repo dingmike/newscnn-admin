@@ -4,6 +4,9 @@
 
     <el-row :gutter="20">
       <el-col :span="4">  <el-button type="primary" icon="el-icon-plus" @click="goAddProduct()">添加商品</el-button></el-col>
+      <el-col :span="4">
+        <i class="el-icon-refresh" @click="reload" :reload='reload'></i>
+      </el-col>
       <el-col :span="4" :offset="16">
         <el-input placeholder="商品名称搜索" v-model="productName" class="input-with-select">
           <el-button slot="append" icon="el-icon-search"  @click="search()"></el-button>
@@ -29,13 +32,14 @@
     data() {
       return {
         tabMapOptions: [
-          { label: '全部', key: 'CN' },
-          { label: '在架', key: 'US' },
-          { label: '已下架', key: 'JP' }
+          { label: '全部', key: 'null' },
+          { label: '在架', key: '1' },
+          { label: '已下架', key: '0' }
         ],
         activeName: 'CN',
         createdTimes: 0,
-        productName: ''
+        productName: '',
+        reload: false,
       }
     },
     methods: {
@@ -46,6 +50,9 @@
         this.$router.push({ path: '/addProduct/index' })
       },
       search() {
+
+      },
+      reload() {
 
       }
     }
