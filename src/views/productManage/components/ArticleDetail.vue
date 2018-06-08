@@ -110,22 +110,22 @@
         <el-form>
           <el-table :data="tableData" :key='key' border fit highlight-current-row style="width: 100%">
             <!--<el-table-column prop="name" label="fruitName" width="180"></el-table-column>-->
-            <el-table-column :key='fruit' v-for='fruit in tableThead' :label="fruit">
+            <el-table-column :key='thead.type' v-for='thead in tableThead' :label="thead.type">
               <template slot-scope="scope">
-                {{scope.row[fruit]}}
+                {{scope.row.specs}}{{thead.type}}
               </template>
             </el-table-column>
-            <el-table-column prop="" label="货号">
+        <!--    <el-table-column prop="" label="货号">
               <template slot-scope="scope">
-                <!--<el-input v-model="postForm.name"></el-input>-->
+                &lt;!&ndash;<el-input v-model="postForm.name"></el-input>&ndash;&gt;
 
                 <el-popover trigger="click" placement="top">
                   <p>货号:
                     <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.marketPrice"></el-input>
                   </p>
                   <div style="text-align: right; margin: 0">
-                    <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
-                    <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
+                    &lt;!&ndash; <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> &ndash;&gt;
+                    &lt;!&ndash; <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> &ndash;&gt;
                   </div>
                   <div slot="reference" class="name-wrapper">
                     {{ scope.row.prices.marketPrice }}
@@ -134,15 +134,18 @@
 
 
               </template>
-            </el-table-column>
+            </el-table-column>-->
             <el-table-column prop="" label="*现价">
               <template slot-scope="scope">
                 <!--<el-input v-model="postForm.name"></el-input>-->
 
                 <el-popover trigger="click" placement="top">
-                  <p>现价:
+                  <el-row>
+                    <el-form-item>
+                      现价:
+                    </el-form-item>
                     <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.advicePrice"></el-input>
-                  </p>
+                  </el-row>
                   <div style="text-align: right; margin: 0">
                     <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
                     <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
@@ -158,15 +161,18 @@
               <template slot-scope="scope">
                 <!--<el-input v-model="postForm.name"></el-input>-->
                 <el-popover trigger="click" placement="top">
-                  <p>原价:
-                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.amount"></el-input>
-                  </p>
+                  <el-row>
+                    <el-form-item>
+                      原价:
+                    </el-form-item>
+                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.marketPrice"></el-input>
+                  </el-row>
                   <div style="text-align: right; margin: 0">
                     <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
                     <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.amount }}
+                    {{ scope.row.prices.marketPrice }}
                   </div>
                 </el-popover>
               </template>
@@ -176,15 +182,18 @@
                 <!--<el-input v-model="postForm.name"></el-input>-->
 
                 <el-popover trigger="click" placement="top">
-                  <p>原价:
-                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.amount"></el-input>
-                  </p>
+                  <el-row>
+                    <el-form-item>
+                      库存:
+                    </el-form-item>
+                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.store"></el-input>
+                  </el-row>
                   <div style="text-align: right; margin: 0">
                     <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
                     <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.amount }}
+                    {{ scope.row.prices.store }}
                   </div>
                 </el-popover>
 
@@ -336,6 +345,7 @@
         children: [{value: '大', isShow: false}, {value: '中', isShow: false}]
       }
     ],
+    product_specs_prices: [],
     productParamsForm: [{
       attribute_category: '家具',
       attribute_name: '涂漆',
@@ -419,17 +429,15 @@
         },
         // 注意此项为数组 type Array
         originalPrices: [{
-          marketPrice: 110,
-          advicePrice: 100,
-          cost: 90,
-          amount: 110
+          marketPrice: 11340,
+          advicePrice: 10440,
+          store: 90,
         }],
         // 批量填写价格
         defaultAddPrices: {
-          marketPrice: 100,
+          marketPrice: 1200,
           advicePrice: 90,
-          cost: 80,
-          amount: 50
+          store: 50
         },
         categories: ['居家', '餐厨', '饮食', '配件', '服装', '杂货'],
         checkList: [],
@@ -451,8 +459,7 @@
           prices: {
             marketPrice: 90,
             advicePrice: 60,
-            cost: 40,
-            amount: 10
+            store: 10
           }
         },
           {
@@ -460,8 +467,7 @@
             prices: {
               marketPrice: 30,
               advicePrice: 70,
-              cost: 30,
-              amount: 10
+              store: 10
             }
           },
           {
@@ -469,8 +475,7 @@
             prices: {
               marketPrice: 20,
               advicePrice: 10,
-              cost: 30,
-              amount: 10
+              store: 10
             }
           },
           {
@@ -478,8 +483,7 @@
             prices: {
               marketPrice: 50,
               advicePrice: 40,
-              cost: 30,
-              amount: 10
+              store: 10
             }
           }
         ],
@@ -527,6 +531,15 @@
           {
             value: '绿色',
             label: '绿色'
+          },
+          {value: '金',
+            label: '金'
+          },
+          {value: '木',
+            label: '木'
+          },
+          {value: '水',
+            label: '水'
           }
         ],
         userLIstOptions: [],
@@ -584,13 +597,16 @@
       // 表格数据
       tableData() {
         debugger
-        var arr = this.specPrices;
+        let arr = this.specPrices;
         console.log(arr)
-        for (var i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
           arr[i].spec0 = arr[i].specs[0]
           arr[i].spec1 = arr[i].specs[1]
+          arr[i].spec2 = arr[i].specs[2]
         }
         // console.log(this.mySpecPrices)
+        console.log('prices arr:-----')
+        console.log(arr)
         return arr
       },
       // 规格表头数据
@@ -600,7 +616,7 @@
         for (let i = 0; i < specs.length; i++) {
           arr.push(specs[i].type)
         }
-        return arr
+        return specs
       }
     },
     created() {
