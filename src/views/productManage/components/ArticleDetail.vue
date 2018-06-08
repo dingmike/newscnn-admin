@@ -69,7 +69,7 @@
                       @mouseover.native="toggleShow(index, index2)" @mouseout.native="toggleShow(index, index2)">
                 <el-form-item>
                   <el-select size="small" v-model.trim.lazy="specValue.value" filterable allow-create placeholder=""
-                             @change="addSpec(spec.children, specValue.value, index, options)">
+                             @change="addSpec(spec.children, specValue.value, index, options, index2)">
                     <el-option
                       v-for="item in options"
                       :key="item.value"
@@ -98,7 +98,7 @@
 
 
         <el-row :gutter="20" style="padding: 12px">
-          <el-button icon="el-icon-plus" size="mini" @click="addProductSku()" plain>添加规格</el-button>
+          <el-button icon="el-icon-plus" size="mini" @click="addProductSku()" :disabled="disableValue" plain>添加规格</el-button>
         </el-row>
 
 
@@ -328,7 +328,7 @@
     product_specs: [{
       type: '颜色',
       isShowValue: false,
-      children: [{value: '红', isShow: false}, {value: '蓝', isShow: false}]
+      children: [{value: '黑', isShow: false}, {value: '蓝', isShow: false}]
     },
       {
         type: '尺寸',
@@ -393,6 +393,7 @@
         setAttributeImg: false,
         isShow: false,
         isShowValue: false,
+        disableValue: false,
         /*      tableData: [
          {
          name: 'fruit-1',
@@ -711,6 +712,11 @@
           children: []
         }
         this.postForm.product_specs.push(obj)
+        if(this.postForm.product_specs.length >= 3){
+          this.disableValue =  true
+        }else{
+          this.disableValue =  false
+        }
       },
       addProductAttribute(row) {
         this.postForm.productParamsForm.push(this.attributeParam)
@@ -730,8 +736,10 @@
         spec[index] = specName;
         console.log(this.specs)
       },
-      addSpec(spec, newSpecName, index, options) {
+      addSpec(spec, newSpecName, index, options, index2) {
         debugger
+
+
         let obj = {value: '', isShow: false}
      /*   Array.prototype.indexOfObj = function (val) {
           for (var i = 0; i < this.length; i++) {
@@ -748,14 +756,47 @@
         console.log(options.indexOfObj(specValueOptionObj))
 
         options.splice(options.indexOfObj(specValueOptionObj), 1)*/
+        console.log('specs--------------')
+        console.log(spec)
+
+
+        console.log('newSpecName--------------')
+        console.log(newSpecName)
 
 
 
-        // 检测新规格名是否规范 1, 不为空. 2,不重复
+                // 检测新规格名是否规范 1, 不为空. 2,不重复
+        if(spec.length>1){
+          for(let j = 0; j<spec.length-1; j++){
+            if(spec[j].value === newSpecName.trim()){
+              this.$message({
+                showClose: true,
+                message: '规格项名称不能为重复!',
+                type: 'warning'
+              })
+              spec[index2].value = '' // 清空
+              return
+            }
+          }
+
+        }
+
+
+/*
+
         if (!newSpecName) {
           alert('规格项名称不能为空')
           return
+        } else if (spec.includes(newSpecName)) {
+          alert('规格项名称不能为重复')
+          return
         }
+*/
+
+
+
+
+
         obj.value = newSpecName
         /*if(obj.value){
          spec.push(obj)
@@ -775,8 +816,8 @@
         debugger
         let obj = {value: '', isShow: false}
 
-        // 删除已选择规格值，防止重复选择
-        Array.prototype.indexOfObj = function (val) {
+        // 删除已选择规格值，防止重复选择  ---- 暂时不使用
+    /*    Array.prototype.indexOfObj = function (val) {
           for (var i = 0; i < this.length; i++) {
             if (this[i].value == val.value) return i;
           }
@@ -793,19 +834,16 @@
         }
         debugger
         console.log(options)
-
+        console.log('newObj: ' + newObj)
+        console.log(newObj)
         console.log(options.indexOfObj(newObj))
+        options.splice(options.indexOfObj(newObj), 1)*/
 
-        options.splice(options.indexOfObj(newObj), 1)
 
-
-//      if (!newSpecName) {
-//        alert('规格项名称不能为空')
-//        return
-//      } else if (spec.includes(newSpecName)) {
-//        alert('规格项名称不能为重复')
-//        return
-//      }
+     /* if (!newSpecName) {
+        alert('规格项名称不能为空')
+        return
+      }*/
         this.postForm.product_specs[index].children.push(obj)
 
       },
@@ -813,6 +851,11 @@
         let index = this.postForm.product_specs.indexOf(item)
         if (index !== -1) {
           this.postForm.product_specs.splice(index, 1)
+        }
+        if(this.postForm.product_specs.length < 3){
+          this.disableValue =  false
+        }else{
+          this.disableValue =  true
         }
       },
       removeSpecValue(index, index2, specValue, options) {
@@ -826,6 +869,7 @@
 
       },
       toggleShow(index, index2) {
+        debugger
         this.postForm.product_specs[index].children[index2].isShow = !this.postForm.product_specs[index].children[index2].isShow
       },
       renderAddSpec(index, newSpecName) {
@@ -844,12 +888,12 @@
       specCombinations() {
         debugger
         console.log(this.postForm.product_specs)
-        var arrWra = [];
+        let arrWra = [];
         // 有2个规格type  children: [{value: '红',isShow: false}, {value:'蓝', isShow: false}]
         if (this.postForm.product_specs.length == 3) {
-          var arr1 = this.postForm.product_specs[0].children
-          var arr2 = this.postForm.product_specs[1].children
-          var arr3 = this.postForm.product_specs[2].children
+          let arr1 = this.postForm.product_specs[0].children
+          let arr2 = this.postForm.product_specs[1].children
+          let arr3 = this.postForm.product_specs[2].children
           // 判断arr1是否为[], 如果是 为其添加个空字符串占位
           if (arr1.length == 0) {
             arr1 = ['']
@@ -860,10 +904,10 @@
           if (arr3.length == 0) {
             arr3 = ['']
           }
-          var arr = []
-          for (var t = 0; t < arr1.length; t++) {
-            for (var i = 0; i < arr2.length; i++) {
-                for(var m = 0; m< arr3.length; m++){
+          let arr = []
+          for (let t = 0; t < arr1.length; t++) {
+            for (let i = 0; i < arr2.length; i++) {
+                for(let m = 0; m< arr3.length; m++){
                   arr = []
                   arr.push(arr1[t].value)
                   arr.push(arr2[i].value)
@@ -877,12 +921,12 @@
           return arrWra
           // 只有1个规格type
         } else if (this.postForm.product_specs.length == 1) {
-          var arr = this.postForm.product_specs[0].children
+          let arr = this.postForm.product_specs[0].children
           if (arr.length == 0) {
             arr = ['']
           }
-          for (var i = 0; i < arr.length; i++) {
-            var _arr = []
+          for (let i = 0; i < arr.length; i++) {
+            let _arr = []
             _arr.push(arr[i].value)
             arrWra.push(_arr)
           }
@@ -891,8 +935,8 @@
           console.log('arrWra hehe............')
           return arrWra
         }else if(this.postForm.product_specs.length == 2){
-          var arr1 = this.postForm.product_specs[0].children
-          var arr2 = this.postForm.product_specs[1].children
+          let arr1 = this.postForm.product_specs[0].children
+          let arr2 = this.postForm.product_specs[1].children
           // 判断arr1是否为[], 如果是 为其添加个空字符串占位
           if (arr1.length == 0) {
             arr1 = ['']
@@ -900,9 +944,9 @@
           if (arr2.length == 0) {
             arr2 = ['']
           }
-          var arr = []
-          for (var t = 0; t < arr1.length; t++) {
-            for (var i = 0; i < arr2.length; i++) {
+          let arr = []
+          for (let t = 0; t < arr1.length; t++) {
+            for (let i = 0; i < arr2.length; i++) {
               arr = []
               arr.push(arr1[t].value)
               arr.push(arr2[i].value)
@@ -920,20 +964,20 @@
         // function sameSpecs(element) {
         //   return element.specs == arr[i];
         // }
-        var arrWra = []
+        let arrWra = []
         // 规格组合 数组
-        var arr = specCombinations
+        let arr = specCombinations
         console.log(arr)
-        for (var i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
           // 新增 规格价格 项
-          var obj = {};
+          let obj = {};
           obj.specs = arr[i];
           // !注意 a类型为数组
           // 对比 新的 规格组合数组 与原价格数组
-          var oldItem = this.specPrices.filter((element) => {
+          let oldItem = this.specPrices.filter((element) => {
             return element.specs + "" === arr[i] + "";
           })
-          var newItem = this.specPrices.filter((element) => {
+          let newItem = this.specPrices.filter((element) => {
             return element.specs + "" != arr[i] + "";
           })
           // 注意这里用的是length因为 空数组,空对象的布尔值为true
