@@ -98,7 +98,8 @@
 
 
         <el-row :gutter="20" style="padding: 12px">
-          <el-button icon="el-icon-plus" size="mini" @click="addProductSku()" :disabled="disableValue" plain>添加规格</el-button>
+          <el-button icon="el-icon-plus" size="mini" @click="addProductSku()" :disabled="disableValue" plain>添加规格
+          </el-button>
         </el-row>
 
 
@@ -108,47 +109,50 @@
           <el-form-item label="规格明细"></el-form-item>
         </el-row>
         <el-form>
-          <el-table :data="tableData" :key='key' border fit highlight-current-row style="width: 100%">
+          <el-table :data="tableData.data" :key='key' border fit highlight-current-row style="width: 100%">
             <!--<el-table-column prop="name" label="fruitName" width="180"></el-table-column>-->
             <el-table-column :key='thead.type' v-for='thead in tableThead' :label="thead.type">
               <template slot-scope="scope">
                 {{scope.row.specs}}{{thead.type}}
               </template>
             </el-table-column>
-        <!--    <el-table-column prop="" label="货号">
-              <template slot-scope="scope">
-                &lt;!&ndash;<el-input v-model="postForm.name"></el-input>&ndash;&gt;
+            <!--    <el-table-column prop="" label="货号">
+                  <template slot-scope="scope">
+                    &lt;!&ndash;<el-input v-model="postForm.name"></el-input>&ndash;&gt;
 
-                <el-popover trigger="click" placement="top">
-                  <p>货号:
-                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.marketPrice"></el-input>
-                  </p>
-                  <div style="text-align: right; margin: 0">
-                    &lt;!&ndash; <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> &ndash;&gt;
-                    &lt;!&ndash; <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> &ndash;&gt;
-                  </div>
-                  <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.marketPrice }}
-                  </div>
-                </el-popover>
+                    <el-popover trigger="click" placement="top">
+                      <p>货号:
+                        <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.marketPrice"></el-input>
+                      </p>
+                      <div style="text-align: right; margin: 0">
+                        &lt;!&ndash; <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> &ndash;&gt;
+                        &lt;!&ndash; <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> &ndash;&gt;
+                      </div>
+                      <div slot="reference" class="name-wrapper">
+                        {{ scope.row.prices.marketPrice }}
+                      </div>
+                    </el-popover>
 
 
-              </template>
-            </el-table-column>-->
+                  </template>
+                </el-table-column>-->
             <el-table-column prop="" label="*现价">
               <template slot-scope="scope">
                 <!--<el-input v-model="postForm.name"></el-input>-->
 
                 <el-popover trigger="click" placement="top">
                   <el-row>
-                    <el-form-item>
-                      现价:
+                    <el-form-item
+                      label="现价:"
+                      prop="prices.advicePrice">
+                      <el-input type="prices.advicePrice" size="mini" class="price-modi"
+                                v-model.number="scope.row.prices.advicePrice"></el-input>
                     </el-form-item>
-                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.advicePrice"></el-input>
+
                   </el-row>
                   <div style="text-align: right; margin: 0">
-                    <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
-                    <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
+                    <!--  <el-button size="mini" type="text" @click="visible2 = false">取消</el-button>
+                      <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button>-->
                   </div>
                   <div slot="reference" class="name-wrapper">
                     {{ scope.row.prices.advicePrice }}
@@ -162,10 +166,13 @@
                 <!--<el-input v-model="postForm.name"></el-input>-->
                 <el-popover trigger="click" placement="top">
                   <el-row>
-                    <el-form-item>
-                      原价:
+
+                    <el-form-item
+                      label="原价:"
+                      prop="prices.marketPrice">
+                    <el-input size="mini" type="prices.marketPrice" class="price-modi"
+                              v-model.number="scope.row.prices.marketPrice"></el-input>
                     </el-form-item>
-                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.marketPrice"></el-input>
                   </el-row>
                   <div style="text-align: right; margin: 0">
                     <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
@@ -183,10 +190,12 @@
 
                 <el-popover trigger="click" placement="top">
                   <el-row>
-                    <el-form-item>
-                      库存:
+                    <el-form-item
+                      label="库存:"
+                      prop="prices.store">
+                    <el-input size="mini" type="prices.store" class="price-modi"
+                              v-model.number="scope.row.prices.store"></el-input>
                     </el-form-item>
-                    <el-input size="mini" class="price-modi" v-model.number="scope.row.prices.store"></el-input>
                   </el-row>
                   <div style="text-align: right; margin: 0">
                     <!-- <el-button size="mini" type="text" @click="visible2 = false">取消</el-button> -->
@@ -304,7 +313,6 @@
         <el-row style="padding: 20px 0">
           <el-button type="primary" :loading="true">发布</el-button>
         </el-row>
-
 
       </div>
     </el-form>
@@ -532,13 +540,16 @@
             value: '绿色',
             label: '绿色'
           },
-          {value: '金',
+          {
+            value: '金',
             label: '金'
           },
-          {value: '木',
+          {
+            value: '木',
             label: '木'
           },
-          {value: '水',
+          {
+            value: '水',
             label: '水'
           }
         ],
@@ -607,7 +618,8 @@
         // console.log(this.mySpecPrices)
         console.log('prices arr:-----')
         console.log(arr)
-        return arr
+        let tableData = {data: arr}
+        return tableData
       },
       // 规格表头数据
       tableThead() {
@@ -645,15 +657,13 @@
         _obj[0].prices = {
           marketPrice: 0,
           advicePrice: 0,
-          cost: 0,
-          amount: 0
+          store: 0
         }
         this.specPrices = _obj
       }
 
       this.typesLength = this.specs.length
       this.enableSpec = this.typesLength ? true : false
-
       this.enableSpec = false
 
       console.log(this.enableSpec)
@@ -728,10 +738,10 @@
           children: []
         }
         this.postForm.product_specs.push(obj)
-        if(this.postForm.product_specs.length >= 3){
-          this.disableValue =  true
-        }else{
-          this.disableValue =  false
+        if (this.postForm.product_specs.length >= 3) {
+          this.disableValue = true
+        } else {
+          this.disableValue = false
         }
       },
       addProductAttribute(row) {
@@ -757,21 +767,21 @@
 
 
         let obj = {value: '', isShow: false}
-     /*   Array.prototype.indexOfObj = function (val) {
-          for (var i = 0; i < this.length; i++) {
-            if (this[i].value == val.value) return i;
-          }
-          return -1;
-        };
-        console.log(newSpecName + '111')
-        let specValueOptionObj = {value: newSpecName, label: newSpecName}
-        debugger
-//      this.productSpecsOptions.remove(specValueOptionObj)
-        console.log(options)
+        /*   Array.prototype.indexOfObj = function (val) {
+         for (var i = 0; i < this.length; i++) {
+         if (this[i].value == val.value) return i;
+         }
+         return -1;
+         };
+         console.log(newSpecName + '111')
+         let specValueOptionObj = {value: newSpecName, label: newSpecName}
+         debugger
+         //      this.productSpecsOptions.remove(specValueOptionObj)
+         console.log(options)
 
-        console.log(options.indexOfObj(specValueOptionObj))
+         console.log(options.indexOfObj(specValueOptionObj))
 
-        options.splice(options.indexOfObj(specValueOptionObj), 1)*/
+         options.splice(options.indexOfObj(specValueOptionObj), 1)*/
         console.log('specs--------------')
         console.log(spec)
 
@@ -780,11 +790,10 @@
         console.log(newSpecName)
 
 
-
-                // 检测新规格名是否规范 1, 不为空. 2,不重复
-        if(spec.length>1){
-          for(let j = 0; j<spec.length-1; j++){
-            if(spec[j].value === newSpecName.trim()){
+        // 检测新规格名是否规范 1, 不为空. 2,不重复
+        if (spec.length > 1) {
+          for (let j = 0; j < spec.length - 1; j++) {
+            if (spec[j].value === newSpecName.trim()) {
               this.$message({
                 showClose: true,
                 message: '规格项名称不能为重复!',
@@ -798,19 +807,16 @@
         }
 
 
-/*
+        /*
 
-        if (!newSpecName) {
-          alert('规格项名称不能为空')
-          return
-        } else if (spec.includes(newSpecName)) {
-          alert('规格项名称不能为重复')
-          return
-        }
-*/
-
-
-
+         if (!newSpecName) {
+         alert('规格项名称不能为空')
+         return
+         } else if (spec.includes(newSpecName)) {
+         alert('规格项名称不能为重复')
+         return
+         }
+         */
 
 
         obj.value = newSpecName
@@ -833,33 +839,33 @@
         let obj = {value: '', isShow: false}
 
         // 删除已选择规格值，防止重复选择  ---- 暂时不使用
-    /*    Array.prototype.indexOfObj = function (val) {
-          for (var i = 0; i < this.length; i++) {
-            if (this[i].value == val.value) return i;
-          }
-          return -1;
-        };
-        let newObj = {value: '', label: ''}
-        for(let n = 0; n < options.length; n ++){
-           for(let i = 0; i < spec.length; i++){
-               if(options[n].value === spec[i].value){
-                 newObj.value = spec[i].value
-                 newObj.label = spec[i].value
-               }
-           }
-        }
-        debugger
-        console.log(options)
-        console.log('newObj: ' + newObj)
-        console.log(newObj)
-        console.log(options.indexOfObj(newObj))
-        options.splice(options.indexOfObj(newObj), 1)*/
+        /*    Array.prototype.indexOfObj = function (val) {
+         for (var i = 0; i < this.length; i++) {
+         if (this[i].value == val.value) return i;
+         }
+         return -1;
+         };
+         let newObj = {value: '', label: ''}
+         for(let n = 0; n < options.length; n ++){
+         for(let i = 0; i < spec.length; i++){
+         if(options[n].value === spec[i].value){
+         newObj.value = spec[i].value
+         newObj.label = spec[i].value
+         }
+         }
+         }
+         debugger
+         console.log(options)
+         console.log('newObj: ' + newObj)
+         console.log(newObj)
+         console.log(options.indexOfObj(newObj))
+         options.splice(options.indexOfObj(newObj), 1)*/
 
 
-     /* if (!newSpecName) {
-        alert('规格项名称不能为空')
-        return
-      }*/
+        /* if (!newSpecName) {
+         alert('规格项名称不能为空')
+         return
+         }*/
         this.postForm.product_specs[index].children.push(obj)
 
       },
@@ -868,20 +874,20 @@
         if (index !== -1) {
           this.postForm.product_specs.splice(index, 1)
         }
-        if(this.postForm.product_specs.length < 3){
-          this.disableValue =  false
-        }else{
-          this.disableValue =  true
+        if (this.postForm.product_specs.length < 3) {
+          this.disableValue = false
+        } else {
+          this.disableValue = true
         }
       },
       removeSpecValue(index, index2, specValue, options) {
         debugger
         this.postForm.product_specs[index].children.splice(index2, 1)
         // 删除规格值恢复规格值的下拉选项个数
-       /* let specValueOptionObj = {value: specValue, label: specValue}
-        if(specValueOptionObj.value){
-          options.push(specValueOptionObj)
-        }*/
+        /* let specValueOptionObj = {value: specValue, label: specValue}
+         if(specValueOptionObj.value){
+         options.push(specValueOptionObj)
+         }*/
 
       },
       toggleShow(index, index2) {
@@ -923,13 +929,13 @@
           let arr = []
           for (let t = 0; t < arr1.length; t++) {
             for (let i = 0; i < arr2.length; i++) {
-                for(let m = 0; m< arr3.length; m++){
-                  arr = []
-                  arr.push(arr1[t].value)
-                  arr.push(arr2[i].value)
-                  arr.push(arr3[m].value)
-                  arrWra.push(arr)
-                }
+              for (let m = 0; m < arr3.length; m++) {
+                arr = []
+                arr.push(arr1[t].value)
+                arr.push(arr2[i].value)
+                arr.push(arr3[m].value)
+                arrWra.push(arr)
+              }
 
             }
           }
@@ -950,7 +956,7 @@
           console.log(arrWra)
           console.log('arrWra hehe............')
           return arrWra
-        }else if(this.postForm.product_specs.length == 2){
+        } else if (this.postForm.product_specs.length == 2) {
           let arr1 = this.postForm.product_specs[0].children
           let arr2 = this.postForm.product_specs[1].children
           // 判断arr1是否为[], 如果是 为其添加个空字符串占位
