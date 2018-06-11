@@ -18,7 +18,7 @@ export function searchGoods(query) {
 export function downUpGoods(query) {
   return request({
     url: 'goods/downUp',
-    method: 'get',
+    method: 'post',
     params: query
   })
 }

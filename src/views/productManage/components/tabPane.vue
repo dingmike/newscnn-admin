@@ -162,10 +162,10 @@ debugger
       // 上下架产品
       handleDownUpProduct(row) {
         debugger
-        let params = {id: row.id, isOnSale: row.is}
+        let params = {id: row.id, isOnSale: row.is_on_sale}
         debugger
         this.loading = true
-        searchGoods().then(response => {
+        downUpGoods(params).then(response => {
           debugger
           this.list = response.data.data.data
           this.total = response.data.data.count
