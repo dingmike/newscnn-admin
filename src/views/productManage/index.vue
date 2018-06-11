@@ -5,7 +5,7 @@
     <el-row :gutter="20">
       <el-col :span="4">  <el-button type="primary" icon="el-icon-plus" @click="goAddProduct()">添加商品</el-button></el-col>
       <el-col :span="4">
-        <i class="el-icon-refresh" @click="reload" :reload='reload'></i>
+        <i class="el-icon-refresh" @click="reloads"></i>
       </el-col>
       <el-col :span="4" :offset="16">
         <el-input placeholder="商品名称搜索" v-model="productName" class="input-with-select">
@@ -14,9 +14,9 @@
       </el-col>
     </el-row>
     <el-tabs style='margin-top:15px;' v-model="activeName" type="border-card">
-      <el-tab-pane v-for="item in tabMapOptions" :label="item.label" :key='item.key' :name="item.key">
+      <el-tab-pane v-for="item in tabMapOptions" :label="item.label" :key='item.key' :name="item.key" type="card">
         <keep-alive>
-          <tab-pane v-if='activeName==item.key' :type='item.key' @create='showCreatedTimes'></tab-pane>
+          <tab-pane v-if='activeName==item.key' :type='item.key' @create='showCreatedTimes' ref="childPane"></tab-pane>
         </keep-alive>
       </el-tab-pane>
     </el-tabs>
@@ -36,10 +36,10 @@
           { label: '在架', key: '1' },
           { label: '已下架', key: '0' }
         ],
-        activeName: 'CN',
+        activeName: 'null',
         createdTimes: 0,
         productName: '',
-        reload: false,
+//        reload: false,
       }
     },
     methods: {
@@ -52,8 +52,8 @@
       search() {
 
       },
-      reload() {
-
+      reloads() {
+        this.$refs.childPane.getList();
       }
     }
   }

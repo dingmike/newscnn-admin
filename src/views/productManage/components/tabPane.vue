@@ -85,7 +85,7 @@
     props: {
       type: {
         type: String,
-        default: 'null'
+        default: ''
       },
       reload: {
         type: Boolean,
@@ -126,6 +126,7 @@
       this.getList()
     },
     created() {
+//      this.getList()
     },
     methods: {
       getList() {
