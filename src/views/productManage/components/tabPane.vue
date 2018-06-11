@@ -60,9 +60,9 @@
       <el-table-column class-name="status-col" label="操作" width="300px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="success" @click="handleDownProduct(scope.row,'published')">下架
+          <el-button size="mini" :type="scope.row.is_on_sale === 1 ? 'warning' : 'success'" @click="handleDownUpProduct(scope.row)">{{scope.row.is_on_sale === 1?'下架':'上架'}}
           </el-button>
-          <el-button size="mini" type="danger" @click="handleDeletProduct(scope.row,'deleted')">删除
+          <el-button size="mini" type="danger" @click="handleDeletProduct(scope.row)">删除
           </el-button>
         </template>
       </el-table-column>
@@ -79,7 +79,7 @@
 </template>
 
 <script>
-  import {fetchGoodsList} from '@/api/goods'
+  import {fetchGoodsList, searchGoods, downUpGoods} from '@/api/goods'
 
   export default {
     props: {
@@ -91,9 +91,6 @@
         type: Boolean,
         default: false
       },
-
-    },
-    watch(){
 
     },
     data() {
@@ -130,9 +127,23 @@
     },
     methods: {
       getList() {
+          debugger
         this.loading = true
 //        this.$emit('create') // for test
+//        this.$emit('refreshLoading', true)
         fetchGoodsList(this.listQuery).then(response => {
+          debugger
+          this.list = response.data.data.data
+          this.total = response.data.data.count
+          this.loading = false
+          this.listLoading = false
+          this.$emit('refreshLoading', false)
+        })
+      },
+      searchGoods(query) {
+        debugger
+        this.loading = true
+        searchGoods(query).then(response => {
           debugger
           this.list = response.data.data.data
           this.total = response.data.data.count
@@ -148,7 +159,19 @@ debugger
         // 编辑商品跳转
 
       },
-      handleDownProduct() {
+      // 上下架产品
+      handleDownUpProduct(row) {
+        debugger
+        let params = {id: row.id, isOnSale: row.is}
+        debugger
+        this.loading = true
+        searchGoods().then(response => {
+          debugger
+          this.list = response.data.data.data
+          this.total = response.data.data.count
+          this.loading = false
+          this.listLoading = false
+        })
 
       },
       handleDeletProduct() {

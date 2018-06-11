@@ -269,16 +269,16 @@
                 <el-popover
                   placement="top"
                   width="100"
-                  v-model="visible2">
+                  v-model="scope.row.isVisible">
                   <p>确定删除吗？</p>
                   <div style="text-align: right; margin: 0">
-                    <el-button size="mini" type="text" @click="visible2 = false">取消</el-button>
-                    <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button>
+                    <el-button size="mini" type="text" @click="scope.row.isVisible = false">取消</el-button>
+                    <el-button type="primary" size="mini" @click="deleteProductAttribute(scope.$index, postForm.productParamsForm)">确定</el-button>
                   </div>
                   <!--<el-button slot="reference">删除</el-button>-->
-                  <el-button slot="reference" type="danger" icon="el-icon-delete"
-                             @click.native.prevent="deleteProductAttribute(scope.$index, postForm.productParamsForm)"></el-button>
-
+                  <el-button slot="reference"
+                             type="danger"
+                             icon="el-icon-delete" size="mini"  @click.native.prevent="scope.row.isVisible = true"></el-button>
                 </el-popover>
               </template>
             </el-table-column>
@@ -357,11 +357,13 @@
     productParamsForm: [{
       attribute_category: '家具',
       attribute_name: '涂漆',
-      attribute_des: '环保涂漆'
+      attribute_des: '环保涂漆',
+      isVisible: false
     }, {
       attribute_category: '家具2',
       attribute_name: '涂漆2',
-      attribute_des: '环保涂漆2'
+      attribute_des: '环保涂漆2',
+      isVisible: false // 显示删除按钮
     }],
     platforms: ['a-platform'],
     comment_disabled: false
@@ -747,7 +749,11 @@
       addProductAttribute(row) {
         this.postForm.productParamsForm.push(this.attributeParam)
       },
+      showPopover(index) {
+
+      },
       deleteProductAttribute(index, rows) {
+          debugger
         rows.splice(index, 1);
         console.log(this.postForm.productParamsForm)
 

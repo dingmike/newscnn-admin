@@ -8,6 +8,21 @@ export function fetchGoodsList(query) {
   })
 }
 
+export function searchGoods(query) {
+  return request({
+    url: 'goods/search',
+    method: 'get',
+    params: query
+  })
+}
+export function downUpGoods(query) {
+  return request({
+    url: 'goods/downUp',
+    method: 'get',
+    params: query
+  })
+}
+
 export function fetchArticle() {
   return request({
     url: '/article/detail',
