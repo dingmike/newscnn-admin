@@ -15,11 +15,11 @@ export function searchGoods(query) {
     params: query
   })
 }
-export function downUpGoods(query) {
+export function downUpGoods(data) {
   return request({
     url: 'goods/downUp',
     method: 'post',
-    params: query
+    data
   })
 }
 
