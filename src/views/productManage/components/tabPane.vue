@@ -38,6 +38,20 @@
         </template>
       </el-table-column>
 
+      <el-table-column width="100px" align="center" label="状态">
+        <template slot-scope="scope">
+          <span>{{scope.row.is_on_sale === 1?'在架状态' : '下架状态'}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="100px" align="center" label="HOT产品">
+        <template slot-scope="scope">
+          <!--<span>{{scope.row.is_hot === 1?'是的' : '不是'}}</span>-->
+          <i v-show="scope.row.is_hot === 1" class="el-icon-success" style="color: red; font-size: 22px"  @click="updateHotGood(scope.row)"></i>
+          <i v-show="scope.row.is_hot === 0" class="el-icon-success" style="color: #cccccc; font-size: 22px"  @click="updateHotGood(scope.row)"></i>
+
+        </template>
+      </el-table-column>
+
       <el-table-column width="100px" align="center" label="库存">
         <template slot-scope="scope">
           <span>{{scope.row.goods_number}}</span>
@@ -59,7 +73,8 @@
 
       <el-table-column class-name="status-col" label="操作" width="300px">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+          <!--<el-button type="primary" size="mini" @click="handleEdit(scope.row)">编辑</el-button>-->
+          <i class="el-icon-edit edit-good-icon" @click="handleEdit(scope.row)"></i>
          <!-- <el-button size="mini" :type="scope.row.is_on_sale === 1 ? 'warning' : 'success'" @click="showDialog(scope.row)">{{scope.row.is_on_sale === 1?'下架':'上架'}}
           </el-button>-->
           <el-button v-show="scope.row.is_on_sale === 1" size="mini" type='warning' @click="showDialog(scope.row)">下架
@@ -67,14 +82,9 @@
           <el-button type="success" v-show="scope.row.is_on_sale === 0" size="mini" @click="handleUpProduct(scope.row)">
             上架
           </el-button>
-
-          <el-button type="primary" size="mini" @click="showDialog(scope.row)">下架{{scope.row.id}}</el-button>
-
           <el-button type="danger" size="mini"  @click="handleDeletProduct(scope.row)">删除
           </el-button>
         </template>
-
-
       </el-table-column>
 
     </el-table>
@@ -108,13 +118,55 @@
     </el-dialog>
 
 
+    <el-dialog
+      title="商品删除确认"
+      :visible.sync="dialogVisible3"
+      width="30%"
+      :before-close="handleClose">
+      <el-row>
+        <el-col :span="24">
+          <span class="down-box">商品删除后不可恢复，买家将无法在店铺中找到该商品。确定删除以下商品？</span>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="4" class="good-pic-head">
+          <img :src="goodsObj.primary_pic_url">
+        </el-col>
+        <el-col :span="20">
+          <span class="goods-name">{{goodsObj.name}}</span>
+        </el-col>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible3 = false">取 消</el-button>
+    <el-button type="primary" @click="handleDeleteProduct(goodsObj)">确认删除</el-button>
+  </span>
+    </el-dialog>
+
+
+
+    <!--更新hot状态-->
+    <el-dialog title="更新hot状态" :visible.sync="dialogVisible4">
+      <el-form>
+        <el-form-item label="活动名称" :label-width="formLabelWidth">
+          <el-radio-group v-model="goodsObj.is_hot" size="mini">
+            <el-radio label="1" border>HOT</el-radio>
+            <el-radio label="0" border>NOT HOT</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible4 = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible4 = false">确 定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 
 
 </template>
 
 <script>
-  import {fetchGoodsList, searchGoods, downUpGoods} from '@/api/goods'
+  import {fetchGoodsList, searchGoods, downUpGoods, deleteGoods} from '@/api/goods'
 
   export default {
     props: {
@@ -134,8 +186,12 @@
         total: null,
         listLoading: true,
         dialogImageUrl: '',
+        formLabelWidth: '80px',
         dialogVisible: false,
         dialogVisible2: false,
+        dialogVisible3: false,
+        dialogVisible4: false,
+        radio10: '1',
         goodsObj: {
           name: '',
           id: '',
@@ -206,7 +262,7 @@ debugger
         // 编辑商品跳转
 
       },
-      // 上下架产品
+      // 上架产品
       handleDownUpProduct(row) {
         debugger
         console.log('goods info: ' + row)
@@ -221,18 +277,56 @@ debugger
         this.loading = true
         downUpGoods(params).then(response => {
           debugger
+          if(response.data.errno === 0 && response.data.data === 1){
             this.getList()
 //          this.list = response.data.data.data
 //          this.total = response.data.data.count
-          this.loading = false
-          this.listLoading = false
-          this.dialogVisible2 = false // 关闭dialog
+            this.loading = false
+            this.listLoading = false
+            this.dialogVisible2 = false // 关闭dialog
+            this.$message({
+              message: '下架成功！',
+              type: 'success'
+            });
+          }else{
+            this.$message({
+              message: '下架失败！',
+              type: 'warning'
+            });
+          }
+
         })
 
       },
+      // 下架产品
       handleUpProduct(row) {
         let params = {id: row.id, isOnSale: 1}
         downUpGoods(params).then(response => {
+          debugger
+
+          if(response.data.errno === 0 && response.data.data === 1){
+            this.getList()
+//          this.list = response.data.data.data
+//          this.total = response.data.data.count
+            this.loading = false
+            this.listLoading = false
+            this.dialogVisible2 = false // 关闭dialog
+            this.$message({
+              message: '上架成功！',
+              type: 'success'
+            });
+          }else{
+            this.$message({
+              message: '上架失败！',
+              type: 'warning'
+            });
+          }
+
+        })
+      },
+      handleDeleteProduct(row) {
+        let params = {id: row.id, isOnSale: 1}
+        deleteGoods(params).then(response => {
           debugger
           this.getList()
 //          this.list = response.data.data.data
@@ -242,8 +336,10 @@ debugger
           this.dialogVisible2 = false // 关闭dialog
         })
       },
-      handleDeletProduct() {
-
+      updateHotGood(row) {
+        this.goodsObj = row
+        console.log('this goods: ' + this.goodsObj.is_hot)
+        this.dialogVisible4 = true;
       },
       handleCurrentChange(val) {
         this.listQuery.page = val
@@ -288,4 +384,11 @@ debugger
     line-height: 60px;
     padding-left: 20px;
   }
+  .edit-good-icon{
+    font-size: 22px;
+    cursor: pointer;
+    color: #000;
+    vertical-align: middle;
+    padding: 0 10px;
+   }
 </style>

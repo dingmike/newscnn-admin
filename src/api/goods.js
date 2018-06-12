@@ -22,6 +22,13 @@ export function downUpGoods(data) {
     data
   })
 }
+export function deleteGoods(query) {
+  return request({
+    url: 'goods/delete',
+    method: 'get',
+    params: query
+  })
+}
 
 export function fetchArticle() {
   return request({
