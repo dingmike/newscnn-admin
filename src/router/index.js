@@ -118,6 +118,21 @@ export const asyncRouterMap = [
     }],
     hidden: false
   },
+  {
+    path: '/editProduct',
+    component: Layout,
+    redirect: '/productManage/editProduct',
+    children: [{
+      path: 'index',
+      component: _import('productManage/editProduct'),
+      name: 'editProduct',
+      meta: { title: 'editProduct', icon: 'documentation', noCache: true }
+    }],
+    hidden: false
+  },
+
+
+
 
   //-----------my navbar end---------------------//
   {

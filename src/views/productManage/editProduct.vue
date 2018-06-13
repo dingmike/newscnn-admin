@@ -7,7 +7,21 @@
 
   export default {
     name: 'createForm',
-    components: { ArticleDetail }
+    components: { ArticleDetail },
+    data() {
+      return {
+        activeName: 'null',
+        createdTimes: 0,
+        productName: '',
+        refreshLoading: false
+      }
+    },
+    mounted() {
+       // alert(this.$route.query.id)
+    },
+    methods: {
+
+    }
   }
 </script>
 

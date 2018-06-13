@@ -30,6 +30,14 @@ export function deleteGoods(query) {
   })
 }
 
+export function updateHotStateGoods(data) {
+  return request({
+    url: 'goods/updateHotState',
+    method: 'post',
+    data
+  })
+}
+
 export function fetchArticle() {
   return request({
     url: '/article/detail',

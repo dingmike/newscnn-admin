@@ -15,8 +15,8 @@
         </el-input>
       </el-col>
     </el-row>
-    <el-tabs style='margin-top:15px;' v-model="activeName" type="border-card">
-      <el-tab-pane v-for="item in tabMapOptions" :label="item.label" :key='item.key' :name="item.key" type="card">
+    <el-tabs style='margin-top:15px;' v-model="activeName" type="border-card" @tab-click="reloads">
+      <el-tab-pane v-for="item in tabMapOptions" :label="item.label" :key='item.key' :name="item.key">
         <keep-alive>
           <tab-pane v-if='activeName==item.key' :type='item.key' @create='showCreatedTimes' @refreshLoading="showRefresLoading" ref="childPane"></tab-pane>
         </keep-alive>
@@ -67,7 +67,8 @@
         this.$refs.childPane[0].getList();
       },
       search() {
-        this.$refs.childPane[0].searchGoods(this.searchQuery);
+        this.activeName = 'null'
+        this.$refs.childPane[0].handlesearchGoods(this.searchQuery);
       }
     }
   }

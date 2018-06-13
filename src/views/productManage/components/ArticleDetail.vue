@@ -378,6 +378,11 @@
         default: false
       }
     },
+    mounted() {
+
+      alert(this.$route.query.id)
+
+    },
     data() {
       const validateRequire = (rule, value, callback) => {
         if (value === '') {

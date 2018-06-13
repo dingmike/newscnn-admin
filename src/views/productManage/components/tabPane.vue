@@ -17,21 +17,18 @@
                        element-loading-text="请给我点时间！">
         <template slot-scope="scope">
           <div class="good-pic-head">
-            <img :src="scope.row.primary_pic_url" @click="dialogVisible = true">
+            <img :src="scope.row.primary_pic_url" @click="showBigImg(scope.row)">
           </div>
-         <!-- <el-dialog width="40%" :visible.sync="dialogVisible">
-              <img width="100%" :src="scope.row.primary_pic_url">
-          </el-dialog>-->
         </template>
       </el-table-column>
 
-      <el-table-column width="380px" align="center" label="商品名称">
+      <el-table-column width="360px" align="center" label="商品名称">
         <template slot-scope="scope">
           <span>{{scope.row.name}}</span>
         </template>
       </el-table-column>
 
-      <el-table-column min-width="100px" label="价格（元）">
+      <el-table-column width="100px" label="价格（元）">
         <template slot-scope="scope">
           <!--<span>{{scope.row.title}}</span>-->
           <el-tag>{{scope.row.retail_price}}</el-tag>
@@ -46,8 +43,8 @@
       <el-table-column width="100px" align="center" label="HOT产品">
         <template slot-scope="scope">
           <!--<span>{{scope.row.is_hot === 1?'是的' : '不是'}}</span>-->
-          <i v-show="scope.row.is_hot === 1" class="el-icon-success" style="color: red; font-size: 22px"  @click="updateHotGood(scope.row)"></i>
-          <i v-show="scope.row.is_hot === 0" class="el-icon-success" style="color: #cccccc; font-size: 22px"  @click="updateHotGood(scope.row)"></i>
+          <i v-show="scope.row.is_hot == 1" class="el-icon-success" style="color: red; font-size: 22px"  @click="updateHotGood(scope.row)"></i>
+          <i v-show="scope.row.is_hot == 0" class="el-icon-success" style="color: #cccccc; font-size: 22px"  @click="updateHotGood(scope.row)"></i>
 
         </template>
       </el-table-column>
@@ -82,7 +79,7 @@
           <el-button type="success" v-show="scope.row.is_on_sale === 0" size="mini" @click="handleUpProduct(scope.row)">
             上架
           </el-button>
-          <el-button type="danger" size="mini"  @click="handleDeletProduct(scope.row)">删除
+          <el-button type="danger" size="mini"  @click="showDeletDialog(scope.row)">删除
           </el-button>
         </template>
       </el-table-column>
@@ -93,7 +90,7 @@
     </el-pagination>
     </div>
 
-    <el-dialog
+    <el-dialog v-el-drag-dialog
       title="商品下架确认"
       :visible.sync="dialogVisible2"
       width="30%"
@@ -118,7 +115,7 @@
     </el-dialog>
 
 
-    <el-dialog
+    <el-dialog v-el-drag-dialog
       title="商品删除确认"
       :visible.sync="dialogVisible3"
       width="30%"
@@ -128,7 +125,7 @@
           <span class="down-box">商品删除后不可恢复，买家将无法在店铺中找到该商品。确定删除以下商品？</span>
         </el-col>
       </el-row>
-      <el-row>
+      <el-row style="background: #ffe6e6;border: 1px solid #ffbebe">
         <el-col :span="4" class="good-pic-head">
           <img :src="goodsObj.primary_pic_url">
         </el-col>
@@ -138,37 +135,60 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible3 = false">取 消</el-button>
-    <el-button type="primary" @click="handleDeleteProduct(goodsObj)">确认删除</el-button>
+    <el-button type="danger" @click="handleDeleteGoods(goodsObj)">确认删除</el-button>
   </span>
     </el-dialog>
 
 
+<!--更新商品hot状态-->
+    <el-dialog v-el-drag-dialog title="修改商品HOT状态" :visible.sync="dialogVisible4" width="30%">
 
-    <!--更新hot状态-->
-    <el-dialog title="更新hot状态" :visible.sync="dialogVisible4">
       <el-form>
-        <el-form-item label="活动名称" :label-width="formLabelWidth">
-          <el-radio-group v-model="goodsObj.is_hot" size="mini">
-            <el-radio label="1" border>HOT</el-radio>
-            <el-radio label="0" border>NOT HOT</el-radio>
-          </el-radio-group>
+        <el-form-item :label-width="formLabelWidth">
+          <el-row>
+            <el-col :span="4" class="good-pic-head">
+              <img :src="goodsObj.primary_pic_url">
+            </el-col>
+            <el-col :span="20">
+              <span class="goods-name">{{goodsObj.name}}</span>
+            </el-col>
+          </el-row>
         </el-form-item>
+        <el-form-item label="商品目前状态：" :label-width="formLabelWidth">
+          <i v-show="goodsObj.is_hot == 1" class="el-icon-success" style="color: red; font-size: 22px"></i>
+          <i v-show="goodsObj.is_hot == 0" class="el-icon-success" style="color: #cccccc; font-size: 22px"></i>
+        </el-form-item>
+        <el-form-item label="修改HOT状态：" :label-width="formLabelWidth">
+          <!--<el-radio-group v-model="goodsObj.is_hot" size="mini">-->
+            <el-radio v-model="goodsObj.is_hot" label="1" border>HOT</el-radio>
+            <el-radio v-model="goodsObj.is_hot" label="0" border>NOT HOT</el-radio>
+          <!--</el-radio-group>-->
+        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible4 = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible4 = false">确 定</el-button>
+        <el-button type="primary" @click="updateHotState(goodsObj)">确 定</el-button>
       </div>
     </el-dialog>
 
+    <!--放大图片-->
+     <el-dialog width="40%" :visible.sync="dialogVisible" v-el-drag-dialog>
+             <div style="width: 100%; height:100%">
+               <img width="100%" :src="goodsObj.primary_pic_url">
+             </div>
+     </el-dialog>
   </div>
 
 
 </template>
 
 <script>
-  import {fetchGoodsList, searchGoods, downUpGoods, deleteGoods} from '@/api/goods'
+  import elDragDialog from '@/directive/el-dragDialog' // base on element-ui
+  import {fetchGoodsList, searchGoods, downUpGoods, deleteGoods, updateHotStateGoods} from '@/api/goods'
 
   export default {
+    directives: { elDragDialog },
     props: {
       type: {
         type: String,
@@ -186,12 +206,11 @@
         total: null,
         listLoading: true,
         dialogImageUrl: '',
-        formLabelWidth: '80px',
+        formLabelWidth: '120px',
         dialogVisible: false,
         dialogVisible2: false,
         dialogVisible3: false,
         dialogVisible4: false,
-        radio10: '1',
         goodsObj: {
           name: '',
           id: '',
@@ -230,7 +249,7 @@
     },
     methods: {
       getList() {
-          debugger
+        debugger
         this.loading = true
 //        this.$emit('create') // for test
 //        this.$emit('refreshLoading', true)
@@ -243,7 +262,7 @@
           this.$emit('refreshLoading', false)
         })
       },
-      searchGoods(query) {
+      handlesearchGoods(query) {
         debugger
         this.loading = true
         searchGoods(query).then(response => {
@@ -257,9 +276,16 @@
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
+      showBigImg(row) {
+        this.goodsObj = row
+        this.dialogVisible = true
+      },
       handleEdit(row) {
 debugger
         // 编辑商品跳转
+        this.$router.push({path: '/editProduct/index',query:{id: row.id}})
+        // this.$route.query.row.xxx 获取参数
+
 
       },
       // 上架产品
@@ -324,7 +350,11 @@ debugger
 
         })
       },
-      handleDeleteProduct(row) {
+      showDeletDialog(row) {
+        this.goodsObj = row
+        this.dialogVisible3 = true
+      },
+      handleDeleteGoods(row) {
         let params = {id: row.id, isOnSale: 1}
         deleteGoods(params).then(response => {
           debugger
@@ -333,13 +363,36 @@ debugger
 //          this.total = response.data.data.count
           this.loading = false
           this.listLoading = false
-          this.dialogVisible2 = false // 关闭dialog
+          this.dialogVisible3 = false // 关闭dialog
         })
       },
       updateHotGood(row) {
         this.goodsObj = row
         console.log('this goods: ' + this.goodsObj.is_hot)
         this.dialogVisible4 = true;
+      },
+      updateHotState(row) {
+debugger
+        let params = {id: row.id, isHot: row.is_hot}
+        updateHotStateGoods(params).then(response => {
+            debugger
+          if(response.data.errno === 0 && response.data.data === 1){
+            this.getList()
+            this.loading = false
+            this.listLoading = false
+            this.dialogVisible4 = false // 关闭dialog
+            this.$message({
+              message: '更新成功！',
+              type: 'success'
+            });
+          }else{
+            this.$message({
+              message: '更新失败！',
+              type: 'warning'
+            });
+          }
+
+          })
       },
       handleCurrentChange(val) {
         this.listQuery.page = val
@@ -350,7 +403,10 @@ debugger
         this.getList()
       },
       handleClose() {
-          alert(1)
+        this.dialogVisible = false // 关闭dialog
+        this.dialogVisible2 = false // 关闭dialog
+        this.dialogVisible3 = false // 关闭dialog
+        this.dialogVisible4 = false // 关闭dialog
       },
       showDialog(row) {
         this.dialogVisible2 = true
