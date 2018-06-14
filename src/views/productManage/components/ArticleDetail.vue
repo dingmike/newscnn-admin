@@ -112,9 +112,9 @@
         <el-form>
           <el-table :data="tableData.data" :key='key' border fit highlight-current-row style="width: 100%">
             <!--<el-table-column prop="name" label="fruitName" width="180"></el-table-column>-->
-            <el-table-column :key='thead.type' v-for='thead in tableThead' :label="thead.type">
+            <el-table-column :key='thead.name' v-for='thead in tableThead' :label="thead.name">
               <template slot-scope="scope">
-                {{scope.row.specs}}{{thead.type}}
+                {{scope.row.specs}}{{thead.name}}
               </template>
             </el-table-column>
             <!--    <el-table-column prop="" label="货号">
@@ -396,7 +396,6 @@
     source_name: '', // 文章外部作者
     display_time: undefined, // 前台展示时间
     id: undefined,
-
     specificationList: [
       {
         specification_id: 2,
@@ -413,7 +412,7 @@
             isShow: false
           },
           {
-            i: 2,
+            id: 2,
             goods_id: 1181000,
             specification_id: 2,
             value: "1.8m床垫*1+枕头*2",
@@ -458,10 +457,59 @@
         ]
       }
     ],
+    "productList": [
+      {
+        "id": 1,
+        "goods_id": 1181000,
+        "goods_specification_ids": "1_5",
+        "goods_sn": "Y100500",
+        "goods_number": 3,
+        "retail_price": 2500
+      },
+      {
+        "id": 2,
+        "goods_id": 1181000,
+        "goods_specification_ids": "2_3",
+        "goods_sn": "Y200300",
+        "goods_number": 23,
+        "retail_price": 2500
+      },
+      {
+        "id": 5,
+        "goods_id": 1181000,
+        "goods_specification_ids": "1_3",
+        "goods_sn": "Y100300",
+        "goods_number": 2,
+        "retail_price": 2000
+      },
+      {
+        "id": 6,
+        "goods_id": 1181000,
+        "goods_specification_ids": "1_4",
+        "goods_sn": "Y100400",
+        "goods_number": 120,
+        "retail_price": 3000
+      },
+      {
+        "id": 3,
+        "goods_id": 1181000,
+        "goods_specification_ids": "2_4",
+        "goods_sn": "Y200400",
+        "goods_number": 2,
+        "retail_price": 2400
+      },
+      {
+        "id": 4,
+        "goods_id": 1181000,
+        "goods_specification_ids": "2_5",
+        "goods_sn": "Y200400",
+        "goods_number": 1,
+        "retail_price": 2100
+      }
+    ],
 
-
-
-    product_specs: [{
+    product_specs_prices: [], // 价格
+    product_specs: [{ // old spec
       type: '颜色',
       isShowValue: false,
       children: [{value: '黑', isShow: false}, {value: '蓝', isShow: false}]
@@ -472,7 +520,7 @@
         children: [{value: '大', isShow: false}, {value: '中', isShow: false}]
       }
     ],
-    product_specs_prices: [],
+
     productParamsForm: [{
       attribute_category: '家具',
       attribute_name: '涂漆',
@@ -498,7 +546,9 @@
       }
     },
     mounted() {
-
+     let specCombinations = this.specCombinations()
+      let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+     this.mySpecPrices(specCombinations, myDefaultAddPrices)
     },
     data() {
       const validateRequire = (rule, value, callback) => {
@@ -568,9 +618,9 @@
         }],
         // 批量填写价格
         defaultAddPrices: {
-          marketPrice: 1200,
-          advicePrice: 90,
-          store: 50
+          marketPrice: 0,
+          advicePrice: 0,
+          store: 0
         },
         categories: ['居家', '餐厨', '饮食', '配件', '服装', '杂货'],
         checkList: [],
@@ -970,8 +1020,10 @@
         console.log(this.postForm.specificationList)
 
         // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
-        var myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
-        var specCombinations = this.specCombinations()
+        let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+        let specCombinations = this.specCombinations()
+        // 去更新价格数据
+        debugger
         this.mySpecPrices(specCombinations, myDefaultAddPrices)
 //      this.newSpecName[index] = ''
 //       console.log(this.specs)
