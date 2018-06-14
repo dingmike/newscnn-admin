@@ -5,6 +5,7 @@
       action="https://httpbin.org/post"
       :multiple="true"
       :limit="10"
+      :file-list="picFiles"
       :on-success="handleImageScucess"
       list-type="picture-card"
       :on-preview="handlePictureCardPreview"
@@ -41,12 +42,19 @@
 </template>
 
 <script>
+import elDragDialog from '@/directive/el-dragDialog' // base on element-ui
 import { getToken } from '@/api/qiniu'
 
 export default {
   name: 'mutilImageUpload',
+  directives: { elDragDialog },
   props: {
-    value: String
+    fileLists: {
+        type: Array,
+        default: function () {
+          return []
+        }
+    }
   },
   computed: {
     imageUrl() {
@@ -58,8 +66,13 @@ export default {
       dialogImageUrl: '',
       dialogVisible: false,
       tempUrl: '',
+      picFiles: this.fileLists,
       dataObj: { token: '', key: '' }
     }
+  },
+  mounted() {
+      console.log('picFiles:')
+      console.log(this.picFiles)
   },
   methods: {
     rmImage() {

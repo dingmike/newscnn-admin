@@ -29,7 +29,7 @@
         <el-row :gutter="20" style="padding: 12px">
           <el-form-item label="商品规格"></el-form-item>
         </el-row>
-        <el-form v-for="(spec, index) in postForm.product_specs" :key="index">
+        <el-form v-for="(spec, index) in postForm.specificationList" :key="index">
           <el-card style="margin-bottom: 20px;height: 12rem; background-color: #fff; padding: 6px">
             <el-row>
               <el-col :span="3">
@@ -37,8 +37,8 @@
               </el-col>
               <el-col :span="4" style="padding: 0 5px">
                 <el-form-item>
-                  <el-select size="small" v-model="spec.type" filterable allow-create placeholder="选择或创建规格名"
-                             @change="renderAddSpec(index, spec.type)">
+                  <el-select size="small" v-model="spec.name" filterable allow-create placeholder="选择或创建规格名"
+                             @change="renderAddSpec(index, spec.name)">
                     <el-option
                       v-for="item in productSpecsOptions"
                       :key="item.value"
@@ -65,11 +65,12 @@
               <!--  <div v-for="specValue in spec.children">
                   {{specValue}}
                 </div>-->
-              <el-col style="padding: 0 5px" :span="4" v-for="(specValue, index2) in spec.children" :key="index2"
+              <el-col style="padding: 0 5px" :span="2" v-for="(specValue, index2) in spec.valueList" :key="index2"
                       @mouseover.native="toggleShow(index, index2)" @mouseout.native="toggleShow(index, index2)">
                 <el-form-item>
+
                   <el-select size="small" v-model.trim.lazy="specValue.value" filterable allow-create placeholder=""
-                             @change="addSpec(spec.children, specValue.value, index, options, index2)">
+                             @change="addSpec(spec.valueList, specValue.value, index, options, index2)">
                     <el-option
                       v-for="item in options"
                       :key="item.value"
@@ -84,7 +85,7 @@
               <el-col :span="2" style="padding-left: 10px">
                 <el-form-item>
                   <el-button icon="el-icon-plus" size="mini"
-                             @click="addSpecsValue(spec.children, newSpecName[index], index, options)" plain>添加规格值
+                             @click="addSpecsValue(spec.valueList, newSpecName[index], index, options)" plain>添加规格值
                   </el-button>
                 </el-form-item>
               </el-col>
@@ -398,54 +399,61 @@
 
     specificationList: [
       {
-        "specification_id": 2,
-        "name": "规格",
-        "valueList": [
+        specification_id: 2,
+        name: "规格23",
+        isShowValue: true,
+        valueList: [
           {
-            "id": 1,
-            "goods_id": 1181000,
-            "specification_id": 2,
-            "value": "1.5m床垫*1+枕头*2",
-            "pic_url": "",
-            "name": "规格"
+            id: 1,
+            goods_id: 1181000,
+            specification_id: 2,
+            value: "1.5m床垫*1+枕头*2",
+            pic_url: "",
+            name: "规格",
+            isShow: false
           },
           {
-            "id": 2,
-            "goods_id": 1181000,
-            "specification_id": 2,
-            "value": "1.8m床垫*1+枕头*2",
-            "pic_url": "",
-            "name": "规格"
+            i: 2,
+            goods_id: 1181000,
+            specification_id: 2,
+            value: "1.8m床垫*1+枕头*2",
+            pic_url: "",
+            name: "规格",
+            isShow: false
           }
         ]
       },
       {
-        "specification_id": 1,
-        "name": "颜色",
-        "valueList": [
+        specification_id: 1,
+        name: "颜色",
+        isShowValue: true, // 显示规格选项
+        valueList: [
           {
-            "id": 3,
-            "goods_id": 1181000,
-            "specification_id": 1,
-            "value": "浅杏粉",
-            "pic_url": "http://yanxuan.nosdn.127.net/10022c73fa7aa75c2c0d736e96cc56d5.png?quality=90&thumbnail=200x200&imageView",
-            "name": "颜色"
+            id: 3,
+            goods_id: 1181000,
+            specification_id: 1,
+            value: "浅杏粉",
+            pic_url: "http://yanxuan.nosdn.127.net/10022c73fa7aa75c2c0d736e96cc56d5.png?quality=90&thumbnail=200x200&imageView",
+            name: "颜色",
+            isShow: false
           },
           {
-            "id": 4,
-            "goods_id": 1181000,
-            "specification_id": 1,
-            "value": "玛瑙红",
-            "pic_url": "http://yanxuan.nosdn.127.net/29442127f431a1a1801c195905319427.png?quality=90&thumbnail=200x200&imageView",
-            "name": "颜色"
+            id: 4,
+            goods_id: 1181000,
+            specification_id: 1,
+            value: "玛瑙红",
+            pic_url: "http://yanxuan.nosdn.127.net/29442127f431a1a1801c195905319427.png?quality=90&thumbnail=200x200&imageView",
+            name: "颜色",
+            isShow: false
           },
           {
-            "id": 5,
-            "goods_id": 1181000,
-            "specification_id": 1,
-            "value": "烟白灰",
-            "pic_url": "http://yanxuan.nosdn.127.net/36f64a7161b67e7fb8ea45be32ecfa25.png?quality=90&thumbnail=200x200&imageView",
-            "name": "颜色"
+            id: 5,
+            goods_id: 1181000,
+            specification_id: 1,
+            value: "烟白灰",
+            pic_url: "http://yanxuan.nosdn.127.net/36f64a7161b67e7fb8ea45be32ecfa25.png?quality=90&thumbnail=200x200&imageView",
+            name: "颜色",
+            isShow: false
           }
         ]
       }
@@ -740,10 +748,10 @@
       },
       // 规格表头数据
       tableThead() {
-        let specs = this.postForm.product_specs
+        let specs = this.postForm.specificationList
         let arr = []
         for (let i = 0; i < specs.length; i++) {
-          arr.push(specs[i].type)
+          arr.push(specs[i].name)
         }
         return specs
       }
@@ -853,11 +861,15 @@
       },
       addProductSku() {
         let obj = {
-          type: '',
-          children: []
+          specification_id: '',
+          name: "",
+          isShowValue: false,
+          valueList: []
         }
-        this.postForm.product_specs.push(obj)
-        if (this.postForm.product_specs.length >= 3) {
+
+
+        this.postForm.specificationList.push(obj)
+        if (this.postForm.specificationList.length >= 3) {
           this.disableValue = true
         } else {
           this.disableValue = false
@@ -889,7 +901,14 @@
         debugger
 
 
-        let obj = {value: '', isShow: false}
+//        let obj = {value: '', isShow: false}
+        let obj = {isShow: false,
+          id: 1,
+          goods_id: '',
+          specification_id: '',
+          value: "",
+          pic_url: "",
+          name: ""}
         /*   Array.prototype.indexOfObj = function (val) {
          for (var i = 0; i < this.length; i++) {
          if (this[i].value == val.value) return i;
@@ -948,7 +967,7 @@
          }*/
 
         console.log(spec)
-        console.log(this.postForm.product_specs)
+        console.log(this.postForm.specificationList)
 
         // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
         var myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
@@ -959,7 +978,14 @@
       },
       addSpecsValue(spec, newSpecName, index, options) {
         debugger
-        let obj = {value: '', isShow: false}
+//        let obj = {value: '', isShow: false}
+        let obj = {isShow: false,
+          id: 1,
+          goods_id: '',
+          specification_id: '',
+          value: "",
+          pic_url: "",
+          name: ""}
 
         // 删除已选择规格值，防止重复选择  ---- 暂时不使用
         /*    Array.prototype.indexOfObj = function (val) {
@@ -989,15 +1015,15 @@
          alert('规格项名称不能为空')
          return
          }*/
-        this.postForm.product_specs[index].children.push(obj)
+        this.postForm.specificationList[index].valueList.push(obj)
 
       },
       removeSpecs(item) {
-        let index = this.postForm.product_specs.indexOf(item)
+        let index = this.postForm.specificationList.indexOf(item)
         if (index !== -1) {
-          this.postForm.product_specs.splice(index, 1)
+          this.postForm.specificationList.splice(index, 1)
         }
-        if (this.postForm.product_specs.length < 3) {
+        if (this.postForm.specificationList.length < 3) {
           this.disableValue = false
         } else {
           this.disableValue = true
@@ -1005,7 +1031,7 @@
       },
       removeSpecValue(index, index2, specValue, options) {
         debugger
-        this.postForm.product_specs[index].children.splice(index2, 1)
+        this.postForm.specificationList[index].valueList.splice(index2, 1)
         // 删除规格值恢复规格值的下拉选项个数
         /* let specValueOptionObj = {value: specValue, label: specValue}
          if(specValueOptionObj.value){
@@ -1015,30 +1041,38 @@
       },
       toggleShow(index, index2) {
         debugger
-        this.postForm.product_specs[index].children[index2].isShow = !this.postForm.product_specs[index].children[index2].isShow
+        this.postForm.specificationList[index].valueList[index2].isShow = !this.postForm.specificationList[index].valueList[index2].isShow
       },
       renderAddSpec(index, newSpecName) {
         debugger
         console.log('specType: ' + newSpecName)
-        this.postForm.product_specs[index].isShowValue = true
-        this.postForm.product_specs[index].children.length = 0
+        this.postForm.specificationList[index].isShowValue = true
+        this.postForm.specificationList[index].valueList.length = 0
         this.formThead.length = 0
         this.formThead.push(newSpecName)
 
 //      渲染一个默认规格值输入框
-        let obj = {value: '', isShow: false}
-        this.postForm.product_specs[index].children.push(obj)
+        let obj = {
+          isShow: false,
+          id: 1,
+          goods_id: '',
+          specification_id: '',
+          value: "",
+          pic_url: "",
+          name: ""}
+
+        this.postForm.specificationList[index].valueList.push(obj)
       },
       // 规格组合数组
       specCombinations() {
         debugger
-        console.log(this.postForm.product_specs)
+        console.log(this.postForm.specificationList)
         let arrWra = [];
         // 有2个规格type  children: [{value: '红',isShow: false}, {value:'蓝', isShow: false}]
-        if (this.postForm.product_specs.length == 3) {
-          let arr1 = this.postForm.product_specs[0].children
-          let arr2 = this.postForm.product_specs[1].children
-          let arr3 = this.postForm.product_specs[2].children
+        if (this.postForm.specificationList.length == 3) {
+          let arr1 = this.postForm.specificationList[0].valueList
+          let arr2 = this.postForm.specificationList[1].valueList
+          let arr3 = this.postForm.specificationList[2].valueList
           // 判断arr1是否为[], 如果是 为其添加个空字符串占位
           if (arr1.length == 0) {
             arr1 = ['']
@@ -1065,8 +1099,8 @@
           console.log(arrWra)
           return arrWra
           // 只有1个规格type
-        } else if (this.postForm.product_specs.length == 1) {
-          let arr = this.postForm.product_specs[0].children
+        } else if (this.postForm.specificationList.length == 1) {
+          let arr = this.postForm.specificationList[0].valueList
           if (arr.length == 0) {
             arr = ['']
           }
@@ -1079,9 +1113,9 @@
           console.log(arrWra)
           console.log('arrWra hehe............')
           return arrWra
-        } else if (this.postForm.product_specs.length == 2) {
-          let arr1 = this.postForm.product_specs[0].children
-          let arr2 = this.postForm.product_specs[1].children
+        } else if (this.postForm.specificationList.length == 2) {
+          let arr1 = this.postForm.specificationList[0].valueList
+          let arr2 = this.postForm.specificationList[1].valueList
           // 判断arr1是否为[], 如果是 为其添加个空字符串占位
           if (arr1.length == 0) {
             arr1 = ['']
@@ -1199,7 +1233,7 @@
   .delete-spec {
     position: relative;
     top: -4rem;
-    right: -10rem;
+    right: -7rem;
     cursor: pointer;
   }
 

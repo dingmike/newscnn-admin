@@ -8,6 +8,14 @@ export function fetchGoodsList(query) {
   })
 }
 
+export function fetchGoodDetail(query) {
+  return request({
+    url: 'goods/detail',
+    method: 'get',
+    params: query
+  })
+}
+
 export function searchGoods(query) {
   return request({
     url: 'goods/search',
