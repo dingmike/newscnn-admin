@@ -3,11 +3,11 @@
     <el-table :data="list" border fit
               highlight-current-row
               show-header
+              size="middle"
               tooltip-effect="dark"
               v-loading="listLoading"
               ref="multipleTable"
-              @selection-change="handleSelectionChange"
-              style="width: 100%">
+              @selection-change="handleSelectionChange">
 
       <el-table-column
         type="selection"
@@ -22,7 +22,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="360px" align="center" label="商品名称">
+      <el-table-column width="240" align="center" label="商品名称">
         <template slot-scope="scope">
           <span>{{scope.row.name}}</span>
         </template>
@@ -93,7 +93,7 @@
     <el-dialog v-el-drag-dialog
       title="商品下架确认"
       :visible.sync="dialogVisible2"
-      width="30%"
+      width="40%"
       :before-close="handleClose">
       <el-row>
         <el-col :span="24">
@@ -118,7 +118,7 @@
     <el-dialog v-el-drag-dialog
       title="商品删除确认"
       :visible.sync="dialogVisible3"
-      width="30%"
+      width="40%"
       :before-close="handleClose">
       <el-row>
         <el-col :span="24">
@@ -141,7 +141,7 @@
 
 
 <!--更新商品hot状态-->
-    <el-dialog v-el-drag-dialog title="修改商品HOT状态" :visible.sync="dialogVisible4" width="30%">
+    <el-dialog v-el-drag-dialog title="修改商品HOT状态" :visible.sync="dialogVisible4" width="40%">
 
       <el-form>
         <el-form-item :label-width="formLabelWidth">

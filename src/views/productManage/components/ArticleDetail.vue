@@ -67,7 +67,7 @@
                 </div>-->
               <el-col style="padding: 0 5px" :span="2" v-for="(specValue, index2) in spec.valueList" :key="index2"
                       @mouseover.native="toggleShow(index, index2)" @mouseout.native="toggleShow(index, index2)">
-                <el-form-item>
+                <el-form-item style="font-size: 12px">
 
                   <el-select size="small" v-model.trim.lazy="specValue.value" filterable allow-create placeholder=""
                              @change="addSpec(spec.valueList, specValue.value, index, options, index2)">
@@ -147,7 +147,7 @@
                       label="现价:"
                       prop="prices.advicePrice">
                       <el-input type="prices.advicePrice" size="mini" class="price-modi"
-                                v-model.number="scope.row.prices.advicePrice"></el-input>
+                                v-model.number="scope.row.prices.retail_price"></el-input>
                     </el-form-item>
 
                   </el-row>
@@ -156,7 +156,7 @@
                       <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button>-->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.advicePrice }}
+                    {{ scope.row.prices.retail_price }}
                   </div>
                 </el-popover>
 
@@ -172,7 +172,7 @@
                       label="原价:"
                       prop="prices.marketPrice">
                       <el-input size="mini" type="prices.marketPrice" class="price-modi"
-                                v-model.number="scope.row.prices.marketPrice"></el-input>
+                                v-model.number="scope.row.prices.retail_price"></el-input>
                     </el-form-item>
                   </el-row>
                   <div style="text-align: right; margin: 0">
@@ -180,7 +180,7 @@
                     <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.marketPrice }}
+                    {{ scope.row.prices.retail_price }}
                   </div>
                 </el-popover>
               </template>
@@ -195,7 +195,7 @@
                       label="库存:"
                       prop="prices.store">
                       <el-input size="mini" type="prices.store" class="price-modi"
-                                v-model.number="scope.row.prices.store"></el-input>
+                                v-model.number="scope.row.prices.goods_number"></el-input>
                     </el-form-item>
                   </el-row>
                   <div style="text-align: right; margin: 0">
@@ -203,7 +203,7 @@
                     <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.store }}
+                    {{ scope.row.prices.goods_number }}
                   </div>
                 </el-popover>
 
@@ -337,7 +337,6 @@
   import {userSearch} from '@/api/remoteSearch'
 
   const defaultForm = {
-
     info: {
       id: '',
       name: "母亲节礼物-舒适安睡组合",
@@ -546,8 +545,11 @@
       }
     },
     mounted() {
+      // 编辑商品渲染数据
      let specCombinations = this.specCombinations()
-      let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+//     let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+     let myDefaultAddPrices = this.postForm.productList
+
      this.mySpecPrices(specCombinations, myDefaultAddPrices)
     },
     data() {
@@ -638,37 +640,43 @@
           }
         ],
         specPrices: [{
-          specs: ['红', '大'],
-          prices: {
-            marketPrice: 90,
-            advicePrice: 60,
-            store: 10
-          }
+          "id": 1,
+          "goods_id": 1181000,
+          "goods_specification_ids": "1_5",
+          "goods_sn": "Y100500",
+          "goods_number": 3,
+          "retail_price": 2500
         },
           {
-            specs: ['红', '中'],
-            prices: {
-              marketPrice: 30,
-              advicePrice: 70,
-              store: 10
-            }
+            "id": 1,
+            "goods_id": 1181000,
+            "goods_specification_ids": "1_5",
+            "goods_sn": "Y100500",
+            "goods_number": 3,
+            "retail_price": 2500
           },
           {
-            specs: ['蓝', '大'],
-            prices: {
-              marketPrice: 20,
-              advicePrice: 10,
-              store: 10
-            }
+            "id": 1,
+            "goods_id": 1181000,
+            "goods_specification_ids": "1_5",
+            "goods_sn": "Y100500",
+            "goods_number": 3,
+            "retail_price": 2500
           },
           {
-            specs: ['蓝', '中'],
-            prices: {
-              marketPrice: 50,
-              advicePrice: 40,
-              store: 10
-            }
+            "id": 1,
+            "goods_id": 1181000,
+            "goods_specification_ids": "1_5",
+            "goods_sn": "Y100500",
+            "goods_number": 3,
+            "retail_price": 2500
           }
+
+//          specs: ['蓝', '中'],
+//        prices: {
+//        marketPrice: 50,
+//          advicePrice: 40,
+//          store: 10
         ],
         newSpecName: ['', ''],
         productSpecsOptions: [
@@ -784,12 +792,28 @@
       tableData() {
         debugger
         let arr = this.specPrices;
+
+
+
+//        {
+//          "id": 1,
+//          "goods_id": 1181000,
+//          "goods_specification_ids": "1_5",
+//          "goods_sn": "Y100500",
+//          "goods_number": 3,
+//          "retail_price": 2500
+//        },
+//          specs: ['蓝', '中'],
+//        prices: {
+//        marketPrice: 50,
+//          advicePrice: 40,
+//          store: 10
         console.log(arr)
-        for (let i = 0; i < arr.length; i++) {
+        /*for (let i = 0; i < arr.length; i++) {
           arr[i].spec0 = arr[i].specs[0]
           arr[i].spec1 = arr[i].specs[1]
           arr[i].spec2 = arr[i].specs[2]
-        }
+        }*/
         // console.log(this.mySpecPrices)
         console.log('prices arr:-----')
         console.log(arr)
@@ -828,14 +852,38 @@
         this.specs.push(obj)
         // console.log(this.specs)
 
+
+        //        {
+//          "id": 1,
+//          "goods_id": 1181000,
+//          "goods_specification_ids": "1_5",
+//          "goods_sn": "Y100500",
+//          "goods_number": 3,
+//          "retail_price": 2500
+//        },
+//          specs: ['蓝', '中'],
+//        prices: {
+//        marketPrice: 50,
+//          advicePrice: 40,
+//          store: 10
+
         // 初始化价格数据
-        let _obj = [{}]
-        _obj[0].specs = ['']
+//        let _obj = [{}]
+//        _obj[0].specs = ['']
+//        _obj[0].prices = {
+//          marketPrice: 0,
+//          advicePrice: 0,
+//          store: 0
+//        }
+
+        let _obj=[{}]
+        _obj[0].goods_specification_ids = ''
         _obj[0].prices = {
           marketPrice: 0,
           advicePrice: 0,
           store: 0
         }
+
         this.specPrices = _obj
       }
 
@@ -1000,7 +1048,6 @@
 
 
         /*
-
          if (!newSpecName) {
          alert('规格项名称不能为空')
          return
@@ -1127,22 +1174,33 @@
           let arr3 = this.postForm.specificationList[2].valueList
           // 判断arr1是否为[], 如果是 为其添加个空字符串占位
           if (arr1.length == 0) {
-            arr1 = ['']
+            arr1 = [{id: '', name: ''}]
           }
           if (arr2.length == 0) {
-            arr2 = ['']
+            arr2 = [ {id: '', name: ''}]
           }
           if (arr3.length == 0) {
-            arr3 = ['']
+            arr3 = [ {id: '', name: ''}]
           }
           let arr = []
+
+      /* {
+          id: 1,
+            goods_id: 1181000,
+            specification_id: 2,
+            value: "1.5m床垫*1+枕头*2",
+            pic_url: "",
+            name: "规格",
+            isShow: false
+        },*/
+
           for (let t = 0; t < arr1.length; t++) {
             for (let i = 0; i < arr2.length; i++) {
               for (let m = 0; m < arr3.length; m++) {
                 arr = []
-                arr.push(arr1[t].value)
-                arr.push(arr2[i].value)
-                arr.push(arr3[m].value)
+                arr.push({id: arr1[t].id, specValue: arr1[t].value})
+                arr.push({id: arr2[i].id, specValue: arr2[i].value})
+                arr.push({id: arr3[m].id, specValue: arr3[m].value})
                 arrWra.push(arr)
               }
 
@@ -1154,11 +1212,11 @@
         } else if (this.postForm.specificationList.length == 1) {
           let arr = this.postForm.specificationList[0].valueList
           if (arr.length == 0) {
-            arr = ['']
+            arr = [{id: '', name: ''}]
           }
           for (let i = 0; i < arr.length; i++) {
             let _arr = []
-            _arr.push(arr[i].value)
+            _arr.push({id: arr[i].id, specValue: arr[i].value})
             arrWra.push(_arr)
           }
           debugger
@@ -1179,11 +1237,12 @@
           for (let t = 0; t < arr1.length; t++) {
             for (let i = 0; i < arr2.length; i++) {
               arr = []
-              arr.push(arr1[t].value)
-              arr.push(arr2[i].value)
+              arr.push({id: arr1[t].id, specValue: arr1[t].value})
+              arr.push({id: arr2[i].id, specValue: arr2[i].value})
               arrWra.push(arr)
             }
           }
+          console.log('规格组合数组——————————————————')
           console.log(arrWra)
           return arrWra
         }
@@ -1191,45 +1250,146 @@
       // 规格价格数据 local
       // 数据更新
       mySpecPrices(specCombinations, myDefaultAddPrices) {
+
+
+
+
         debugger
-        // function sameSpecs(element) {
-        //   return element.specs == arr[i];
-        // }
-        let arrWra = []
-        // 规格组合 数组
-        let arr = specCombinations
-        console.log(arr)
-        for (let i = 0; i < arr.length; i++) {
-          // 新增 规格价格 项
-          let obj = {};
-          obj.specs = arr[i];
-          // !注意 a类型为数组
-          // 对比 新的 规格组合数组 与原价格数组
-          let oldItem = this.specPrices.filter((element) => {
-            return element.specs + "" === arr[i] + "";
-          })
-          let newItem = this.specPrices.filter((element) => {
-            return element.specs + "" != arr[i] + "";
-          })
-          // 注意这里用的是length因为 空数组,空对象的布尔值为true
-          // 旧规各项价格
-          if (oldItem.length) {
-            obj.prices = oldItem[0].prices
-            console.log(oldItem[0])
-            // 新规各项价格
-          } else {
-            console.log(newItem)
-            console.log('_____')
-            // if (newItem.length != 0) {
-            // 这里用深拷贝否则各新项目的价格数据会关联
-            newItem[0].prices = JSON.parse(JSON.stringify(myDefaultAddPrices));
-            obj.prices = newItem[0].prices
-            // }
+        // specCombinations 规格组合数组，
+        // myDefaultAddPrices 默认规格对应价格等参数
+
+        // 编辑数据时候
+        if(Array.isArray(myDefaultAddPrices)){
+
+          let arrWra = []
+          // 规格组合 数组
+          let arr = specCombinations
+          for (let i = 0; i < arr.length; i++) {
+            // 新增 规格价格 项
+            let obj = {};
+            obj.specs = arr[i];
+            // !注意 a类型为数组
+
+//              "id": 1,
+//              "goods_id": 1181000,
+//              "goods_specification_ids": "1_5",
+//              "goods_sn": "Y100500",
+//              "goods_number": 3,
+//              "retail_price": 2500
+            // 对比 新的 规格组合数组 与原价格数组
+            let oldItem = this.specPrices.filter((element) => {
+              let oldSpecIdArr = [];
+              for(let k = 0; k<arr[i].length; k++){
+                oldSpecIdArr.push(arr[i].id)
+              }
+              let specIds = element.goods_specification_ids
+              let specIdArr = specIds.split('_')
+              return oldSpecIdArr.sort().toString() == specIdArr.sort().toString()
+            })
+            let newItem = this.specPrices.filter((element) => {
+
+              let oldSpecIdArr = [];
+              for(let k = 0; k<arr[i].length; k++){
+                oldSpecIdArr.push(arr[i].id)
+              }
+              let specIds = element.goods_specification_ids
+              let specIdArr = specIds.split('_')
+              return oldSpecIdArr.sort().toString() != specIdArr.sort().toString()
+
+            })
+
+
+            // 注意这里用的是length因为 空数组,空对象的布尔值为true
+            // 旧规各项价格
+            if (oldItem.length) {
+              obj.prices = oldItem[0].prices
+              console.log(oldItem[0])
+              // 新规各项价格
+            } else {
+              debugger
+             //  绑定规格价格
+              let newSpecPrices = '';
+              for(let x=0; x< myDefaultAddPrices.length; x++){
+                let oldSpecIdArr = [];
+                for(let k = 0; k<arr[i].length; k++){
+                  oldSpecIdArr.push(arr[i][k].id)
+                }
+                debugger
+                let specIds = myDefaultAddPrices[x].goods_specification_ids +''
+                let specIdArr = specIds.split('_')
+
+                if(oldSpecIdArr.sort().toString() == specIdArr.sort().toString()){
+                  newSpecPrices = myDefaultAddPrices[x]
+                }
+              }
+
+              // if (newItem.length != 0) {
+              // 这里用深拷贝否则各新项目的价格数据会关联
+//              newItem[0].prices = JSON.parse(JSON.stringify(myDefaultAddPrices));
+              newItem[0].prices = newSpecPrices
+              obj.prices = newItem[0].prices
+              // }
+            }
+            arrWra.push(obj)
           }
-          arrWra.push(obj)
-        }
-        console.log(arrWra)
+          console.log('规格组合和价格拼接后～～～～～～～～～3333333～～～～～～～～～～～～')
+          console.log(arrWra)
+          this.specPrices = arrWra
+
+
+
+        }else{
+
+          // function sameSpecs(element) {
+          //   return element.specs == arr[i];
+          // }
+          let arrWra = []
+          // 规格组合 数组
+          let arr = specCombinations
+          for (let i = 0; i < arr.length; i++) {
+            // 新增 规格价格 项
+            let obj = {};
+            obj.specs = arr[i];
+            // !注意 a类型为数组
+            // 对比 新的 规格组合数组 与原价格数组
+            let oldItem = this.specPrices.filter((element) => {
+              return element.specs + "" === arr[i] + "";
+            })
+            let newItem = this.specPrices.filter((element) => {
+              return element.specs + "" != arr[i] + "";
+            })
+            // 注意这里用的是length因为 空数组,空对象的布尔值为true
+            // 旧规各项价格
+            if (oldItem.length) {
+              obj.prices = oldItem[0].prices
+              console.log(oldItem[0])
+              // 新规各项价格
+            } else {
+              console.log(newItem)
+              console.log('_____')
+              // if (newItem.length != 0) {
+              // 这里用深拷贝否则各新项目的价格数据会关联
+              newItem[0].prices = JSON.parse(JSON.stringify(myDefaultAddPrices));
+              obj.prices = newItem[0].prices
+              // }
+            }
+            arrWra.push(obj)
+          }
+           console.log('规格组合和价格拼接后～～～～～～～～～～～～～～～～～～～～～')
+          console.log(arrWra)
         this.specPrices = arrWra
+        }
+
+
+
+
+
+
+
+
+      // console.log('规格组合和价格拼接后～～～～～～～～～～～～～～～～～～～～～')
+        //console.log(arrWra)
+//        this.specPrices = arrWra
       }
     }
   }
@@ -1285,7 +1445,7 @@
   .delete-spec {
     position: relative;
     top: -4rem;
-    right: -7rem;
+    right: -68px;
     cursor: pointer;
   }
 
@@ -1296,4 +1456,3 @@
   }
 
 </style>
-
