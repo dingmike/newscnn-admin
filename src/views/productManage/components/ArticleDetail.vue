@@ -13,7 +13,7 @@
 
         <el-row>
           <el-col :span="12">
-            <el-form-item label="商品标题" prop="title">
+            <el-form-item label="商品标题" prop="name">
               <el-input v-model="postForm.info.name"></el-input>
             </el-form-item>
 
@@ -743,13 +743,13 @@
           {key: 'c-platform', name: 'c-platform'}
         ],
         rules: {
-          title: [
+          name: [
             {required: true, message: '请输入商品标题', trigger: 'blur'},
-            {min: 3, max: 5, message: '长度在 3 到 50 个字符', trigger: 'blur'}
+            {min: 3, max: 50, message: '长度在 3 到 50 个字符', trigger: 'blur'}
           ],
           introduce: [
             {required: true, message: '请输入卖点介绍', trigger: 'blur'},
-            {min: 3, max: 5, message: '长度在 3 到 50 个字符', trigger: 'blur'}
+            {min: 3, max:50, message: '长度在 3 到 50 个字符', trigger: 'blur'}
           ],
           region: [
             {required: true, message: '请选择活动区域', trigger: 'change'}
@@ -1117,10 +1117,22 @@
         this.postForm.specificationList[index].valueList.push(obj)
 
       },
+      // 删除规格表单
       removeSpecs(item) {
         let index = this.postForm.specificationList.indexOf(item)
         if (index !== -1) {
+            debugger
           this.postForm.specificationList.splice(index, 1)
+          console.log('删除后的-------------------------------------------------')
+          console.log( this.postForm.specificationList)
+          // 删除后重新渲染规格价格表单
+
+          // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
+          let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+          let specCombinations = this.specCombinations()
+          // 去更新价格数据
+          this.mySpecPrices(specCombinations, myDefaultAddPrices)
+
         }
         if (this.postForm.specificationList.length < 3) {
           this.disableValue = false
@@ -1131,19 +1143,17 @@
       removeSpecValue(index, index2, specValue, options) {
         debugger
         this.postForm.specificationList[index].valueList.splice(index2, 1)
-        // 删除规格值恢复规格值的下拉选项个数
-        /* let specValueOptionObj = {value: specValue, label: specValue}
-         if(specValueOptionObj.value){
-         options.push(specValueOptionObj)
-         }*/
+        // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
+        let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+        let specCombinations = this.specCombinations()
+        // 去更新价格数据
+        this.mySpecPrices(specCombinations, myDefaultAddPrices)
 
       },
       toggleShow(index, index2) {
-        debugger
         this.postForm.specificationList[index].valueList[index2].isShow = !this.postForm.specificationList[index].valueList[index2].isShow
       },
       renderAddSpec(index, newSpecName) {
-        debugger
         console.log('specType: ' + newSpecName)
         this.postForm.specificationList[index].isShowValue = true
         this.postForm.specificationList[index].valueList.length = 0
@@ -1444,8 +1454,7 @@
 
   .delete-spec {
     position: relative;
-    top: -4rem;
-    right: -68px;
+    top: -64px;
     cursor: pointer;
   }
 
