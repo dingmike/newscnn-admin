@@ -1174,7 +1174,6 @@
       },
       // 规格组合数组
       specCombinations() {
-        debugger
         console.log(this.postForm.specificationList)
         let arrWra = [];
         // 有2个规格type  children: [{value: '红',isShow: false}, {value:'蓝', isShow: false}]
@@ -1261,10 +1260,6 @@
       // 数据更新
       mySpecPrices(specCombinations, myDefaultAddPrices) {
 
-
-
-
-        debugger
         // specCombinations 规格组合数组，
         // myDefaultAddPrices 默认规格对应价格等参数
 
