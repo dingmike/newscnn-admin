@@ -1177,9 +1177,6 @@
       },
       renderAddSpec(index, newSpecName) {
 
-        debugger
-
-
         // 验证重复的
         for (let j = 0; j <  this.postForm.specificationList.length; j++) {
           if (this.postForm.specificationList[j].name === newSpecName.trim() && j!=index) {
@@ -1211,8 +1208,6 @@
           pic_url: "",
           name: ""
         }
-
-
 
 
         this.postForm.specificationList[index].valueList.push(obj)
