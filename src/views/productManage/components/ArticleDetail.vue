@@ -1125,6 +1125,8 @@
       },
       // 删除规格表单
       removeSpecs(item) {
+
+
         let index = this.postForm.specificationList.indexOf(item)
 
 
@@ -1177,6 +1179,22 @@
 
         debugger
 
+
+        // 验证重复的
+        for (let j = 0; j <  this.postForm.specificationList.length; j++) {
+          if (this.postForm.specificationList[j].name === newSpecName.trim() && j!=index) {
+            debugger
+            this.$message({
+              showClose: true,
+              message: '规格属性名不能为重复!',
+              type: 'warning'
+            })
+            this.postForm.specificationList[index].name = '' // 清空
+            return
+          }
+        }
+
+
         console.log('specType: ' + newSpecName)
         this.postForm.specificationList[index].isShowValue = true
         this.postForm.specificationList[index].valueList.length = 0
@@ -1194,18 +1212,7 @@
           name: ""
         }
 
-        // 验证重复的
-        for (let j = 0; j <  this.postForm.specificationList.length; j++) {
-          if (this.postForm.specificationList[j].name === newSpecName.trim()) {
-            this.$message({
-              showClose: true,
-              message: '规格属性名不能为重复!',
-              type: 'warning'
-            })
-            this.postForm.specificationList[index].name = '' // 清空
-            return
-          }
-        }
+
 
 
         this.postForm.specificationList[index].valueList.push(obj)
