@@ -1199,10 +1199,10 @@
           if (this.postForm.specificationList[j].name === newSpecName.trim()) {
             this.$message({
               showClose: true,
-              message: '规格项名称不能为重复!',
+              message: '规格属性名不能为重复!',
               type: 'warning'
             })
-            this.postForm.specificationList[j].name = '' // 清空
+            this.postForm.specificationList[index].name = '' // 清空
             return
           }
         }
