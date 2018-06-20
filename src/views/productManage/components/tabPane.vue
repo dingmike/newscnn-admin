@@ -11,7 +11,7 @@
 
       <el-table-column
         type="selection"
-        width="34px">
+        width="30px">
       </el-table-column>
       <el-table-column align="center" label="商品图" width="80px" v-loading="loading"
                        element-loading-text="请给我点时间！">

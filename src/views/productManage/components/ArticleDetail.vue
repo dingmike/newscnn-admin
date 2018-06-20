@@ -139,7 +139,7 @@
                 </el-table-column>-->
             <el-table-column prop="" label="*现价">
               <template slot-scope="scope">
-                <!--<el-input v-model="postForm.name"></el-input>-->
+                <!--<el-input v-model.number="scope.row.prices.retail_price"></el-input>-->
 
                 <el-popover trigger="click" placement="top">
                   <el-row>
@@ -156,7 +156,7 @@
                       <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button>-->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.retail_price }}
+                    {{ scope.row.prices.retail_price===null||""? 0: scope.row.prices.retail_price}}
                   </div>
                 </el-popover>
 
@@ -164,7 +164,7 @@
             </el-table-column>
             <el-table-column prop="" label="*原价">
               <template slot-scope="scope">
-                <!--<el-input v-model="postForm.name"></el-input>-->
+                <!--<el-input v-model.number="scope.row.prices.retail_price"></el-input>-->
                 <el-popover trigger="click" placement="top">
                   <el-row>
 
@@ -180,14 +180,14 @@
                     <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.retail_price }}
+                    {{ scope.row.prices.retail_price===null||""? 0: scope.row.prices.retail_price}}
                   </div>
                 </el-popover>
               </template>
             </el-table-column>
             <el-table-column prop="" label="*库存">
               <template slot-scope="scope">
-                <!--<el-input v-model="postForm.name"></el-input>-->
+                <!--<el-input v-model.number="scope.row.prices.goods_number"></el-input>-->
 
                 <el-popover trigger="click" placement="top">
                   <el-row>
@@ -203,7 +203,7 @@
                     <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.goods_number }}
+                    {{ scope.row.prices.goods_number===null||""? 0: scope.row.prices.goods_number }}
                   </div>
                 </el-popover>
 
@@ -620,9 +620,15 @@
         }],
         // 批量填写价格
         defaultAddPrices: {
-          marketPrice: 0,
+        /*  marketPrice: 0,
           advicePrice: 0,
-          store: 0
+          store: 0*/
+          "id": 1,
+          "goods_id": 0,
+//          "goods_specification_ids": "1_2",
+          "goods_sn": "Y100500",
+          "goods_number": 0,
+          "retail_price": 0
         },
         categories: ['居家', '餐厨', '饮食', '配件', '服装', '杂货'],
         checkList: [],
@@ -967,6 +973,23 @@
 
 
         this.postForm.specificationList.push(obj)
+
+       let defaultAddPrices = {
+            goods_number: 0,
+            retail_price: 0
+        }
+
+
+        // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
+        let myDefaultAddPrices = JSON.parse(JSON.stringify(defaultAddPrices));
+        let specCombinations = this.specCombinations()
+        // 去更新价格数据
+        debugger
+        this.mySpecPrices(specCombinations, myDefaultAddPrices)
+
+
+
+
         if (this.postForm.specificationList.length >= 3) {
           this.disableValue = true
         } else {
@@ -1066,8 +1089,17 @@
         console.log(spec)
         console.log(this.postForm.specificationList)
 
+
+
+
+        let defaultAddPrices = {
+          goods_number: 0,
+          retail_price: 0
+        }
+
+
         // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
-        let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+        let myDefaultAddPrices = JSON.parse(JSON.stringify(defaultAddPrices));
         let specCombinations = this.specCombinations()
         // 去更新价格数据
         debugger
@@ -1120,6 +1152,14 @@
       // 删除规格表单
       removeSpecs(item) {
         let index = this.postForm.specificationList.indexOf(item)
+
+
+
+        let defaultAddPrices = {
+          goods_number: 0,
+          retail_price: 0
+        }
+
         if (index !== -1) {
             debugger
           this.postForm.specificationList.splice(index, 1)
@@ -1128,7 +1168,7 @@
           // 删除后重新渲染规格价格表单
 
           // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
-          let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+          let myDefaultAddPrices = JSON.parse(JSON.stringify(defaultAddPrices));
           let specCombinations = this.specCombinations()
           // 去更新价格数据
           this.mySpecPrices(specCombinations, myDefaultAddPrices)
@@ -1142,9 +1182,16 @@
       },
       removeSpecValue(index, index2, specValue, options) {
         debugger
+
+
+        let defaultAddPrices = {
+          goods_number: 0,
+          retail_price: 0
+        }
+
         this.postForm.specificationList[index].valueList.splice(index2, 1)
         // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
-        let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+        let myDefaultAddPrices = JSON.parse(JSON.stringify(defaultAddPrices));
         let specCombinations = this.specCombinations()
         // 去更新价格数据
         this.mySpecPrices(specCombinations, myDefaultAddPrices)
@@ -1259,7 +1306,7 @@
       // 规格价格数据 local
       // 数据更新
       mySpecPrices(specCombinations, myDefaultAddPrices) {
-
+debugger
         // specCombinations 规格组合数组，
         // myDefaultAddPrices 默认规格对应价格等参数
 
@@ -1327,13 +1374,13 @@
                   newSpecPrices = myDefaultAddPrices[x]
                 }
               }
-
-              // if (newItem.length != 0) {
-              // 这里用深拷贝否则各新项目的价格数据会关联
-//              newItem[0].prices = JSON.parse(JSON.stringify(myDefaultAddPrices));
-              newItem[0].prices = newSpecPrices
+debugger
+//               if (newItem.length != 0) {
+//               这里用深拷贝否则各新项目的价格数据会关联
+              newItem[0].prices = JSON.parse(JSON.stringify(newSpecPrices));
+//              newItem[0].prices = newSpecPrices
               obj.prices = newItem[0].prices
-              // }
+//               }
             }
             arrWra.push(obj)
           }
@@ -1344,7 +1391,7 @@
 
 
         }else{
-
+debugger
           // function sameSpecs(element) {
           //   return element.specs == arr[i];
           // }
@@ -1352,6 +1399,7 @@
           // 规格组合 数组
           let arr = specCombinations
           for (let i = 0; i < arr.length; i++) {
+    debugger
             // 新增 规格价格 项
             let obj = {};
             obj.specs = arr[i];
@@ -1366,8 +1414,7 @@
             // 注意这里用的是length因为 空数组,空对象的布尔值为true
             // 旧规各项价格
             if (oldItem.length) {
-              obj.prices = oldItem[0].prices
-              console.log(oldItem[0])
+              obj.prices = JSON.parse(JSON.stringify( oldItem[0].prices ))
               // 新规各项价格
             } else {
               console.log(newItem)
@@ -1383,6 +1430,9 @@
            console.log('规格组合和价格拼接后～～～～～～～～～～～～～～～～～～～～～')
           console.log(arrWra)
         this.specPrices = arrWra
+
+          debugger
+          console.log(this.postForm)
         }
 
 
