@@ -41,9 +41,10 @@
                              @change="renderAddSpec(index, spec.name)">
                     <el-option
                       v-for="item in productSpecsOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
+                      :key="item.id"
+                      :value-key="item.id"
+                      :label="item.name"
+                      :value="item.name">
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -70,22 +71,23 @@
                 <el-form-item style="font-size: 12px">
 
                   <el-select size="small" v-model.trim.lazy="specValue.value" filterable allow-create placeholder=""
-                             @change="addSpec(spec.valueList, specValue.value, index, options, index2)">
+                             @change="addSpec(spec.valueList, specValue.value, index, specValueOptions, index2)">
                     <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
+                      v-for="item in specValueOptions"
+                      :key="item.id"
+                      :label="item.value"
                       :value="item.value">
                     </el-option>
                   </el-select>
                 </el-form-item>
                 <i class="el-icon-error delete-spec" ref="" v-show="specValue.isShow"
-                   @click="removeSpecValue(index, index2, specValue.value, options)"></i>
+                   @click="removeSpecValue(index, index2, specValue.value, specValueOptions)"></i>
               </el-col>
               <el-col :span="2" style="padding-left: 10px">
                 <el-form-item>
                   <el-button icon="el-icon-plus" size="mini"
-                             @click="addSpecsValue(spec.valueList, newSpecName[index], index, options)" plain>添加规格值
+                             @click="addSpecsValue(spec.valueList, newSpecName[index], index, specValueOptions)" plain>
+                    添加规格值
                   </el-button>
                 </el-form-item>
               </el-col>
@@ -156,7 +158,7 @@
                       <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button>-->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.retail_price===null||""? 0: scope.row.prices.retail_price}}
+                    {{ scope.row.prices.retail_price === null || "" ? 0 : scope.row.prices.retail_price}}
                   </div>
                 </el-popover>
 
@@ -180,7 +182,7 @@
                     <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.retail_price===null||""? 0: scope.row.prices.retail_price}}
+                    {{ scope.row.prices.retail_price === null || "" ? 0 : scope.row.prices.retail_price}}
                   </div>
                 </el-popover>
               </template>
@@ -203,7 +205,7 @@
                     <!-- <el-button type="primary" size="mini" @click="visible2 = false">确定</el-button> -->
                   </div>
                   <div slot="reference" class="name-wrapper">
-                    {{ scope.row.prices.goods_number===null||""? 0: scope.row.prices.goods_number }}
+                    {{ scope.row.prices.goods_number === null || "" ? 0 : scope.row.prices.goods_number }}
                   </div>
                 </el-popover>
 
@@ -244,9 +246,9 @@
 
                 <el-select size="small" v-model="scope.row.attribute_category" filterable placeholder="请输入分类">
                   <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
+                    v-for="item in specValueOptions"
+                    :key="item.id"
+                    :label="item.value"
                     :value="item.value">
                   </el-option>
                 </el-select>
@@ -335,6 +337,7 @@
   //  import {fetchArticle} from '@/api/article'
   import {fetchGoodDetail} from '@/api/goods'
   import {userSearch} from '@/api/remoteSearch'
+  import {fetchGoodsList, searchGoods, downUpGoods, getSpecifications, getSpecValue} from '@/api/goods'
 
   const defaultForm = {
     info: {
@@ -398,7 +401,7 @@
     specificationList: [
       {
         specification_id: 2,
-        name: "规格23",
+        name: "规格",
         isShowValue: true,
         valueList: [
           {
@@ -456,7 +459,7 @@
         ]
       }
     ],
-    "productList": [
+    productList: [
       {
         "id": 1,
         "goods_id": 1181000,
@@ -545,12 +548,18 @@
       }
     },
     mounted() {
-      // 编辑商品渲染数据
-     let specCombinations = this.specCombinations()
-//     let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
-     let myDefaultAddPrices = this.postForm.productList
+      // get specs options
+//      productSpecsOptions
 
-     this.mySpecPrices(specCombinations, myDefaultAddPrices)
+      this.fetchSpecs()
+
+
+      // 编辑商品渲染数据
+      let specCombinations = this.specCombinations()
+//     let myDefaultAddPrices = JSON.parse(JSON.stringify(this.defaultAddPrices));
+      let myDefaultAddPrices = this.postForm.productList
+
+      this.mySpecPrices(specCombinations, myDefaultAddPrices)
     },
     data() {
       const validateRequire = (rule, value, callback) => {
@@ -589,20 +598,6 @@
         isShow: false,
         isShowValue: false,
         disableValue: false,
-        /*      tableData: [
-         {
-         name: 'fruit-1',
-         apple: 'apple-10',
-         banana: 'banana-10',
-         orange: 'orange-10'
-         },
-         {
-         name: 'fruit-2',
-         apple: 'apple-20',
-         banana: 'banana-20',
-         orange: 'orange-20'
-         }
-         ],*/
         key: 1, // table key
         formTheadOptions: ['apple', 'banana', 'orange'],
         checkboxVal: ['apple', 'banana'], // checkboxVal
@@ -620,9 +615,9 @@
         }],
         // 批量填写价格
         defaultAddPrices: {
-        /*  marketPrice: 0,
-          advicePrice: 0,
-          store: 0*/
+          /*  marketPrice: 0,
+           advicePrice: 0,
+           store: 0*/
           "id": 1,
           "goods_id": 0,
 //          "goods_specification_ids": "1_2",
@@ -645,38 +640,7 @@
             children: ['大', '中']
           }
         ],
-        specPrices: [{
-          "id": 1,
-          "goods_id": 1181000,
-          "goods_specification_ids": "1_5",
-          "goods_sn": "Y100500",
-          "goods_number": 3,
-          "retail_price": 2500
-        },
-          {
-            "id": 1,
-            "goods_id": 1181000,
-            "goods_specification_ids": "1_5",
-            "goods_sn": "Y100500",
-            "goods_number": 3,
-            "retail_price": 2500
-          },
-          {
-            "id": 1,
-            "goods_id": 1181000,
-            "goods_specification_ids": "1_5",
-            "goods_sn": "Y100500",
-            "goods_number": 3,
-            "retail_price": 2500
-          },
-          {
-            "id": 1,
-            "goods_id": 1181000,
-            "goods_specification_ids": "1_5",
-            "goods_sn": "Y100500",
-            "goods_number": 3,
-            "retail_price": 2500
-          }
+        specPrices: [
 
 //          specs: ['蓝', '中'],
 //        prices: {
@@ -687,59 +651,50 @@
         newSpecName: ['', ''],
         productSpecsOptions: [
           {
-            value: '家具',
-            label: '家具'
+            id: 1,
+            name: '家具'
           }, {
-            value: '尺寸',
-            label: '尺寸'
+            id: 2,
+            name: '尺寸'
           }, {
-            value: '双皮奶',
-            label: '双皮奶'
+            id: 3,
+            name: '双皮奶'
           }, {
-            value: '蚵仔煎',
-            label: '蚵仔煎'
+            id: 4,
+            name: '蚵仔煎'
           }, {
-            value: '龙须面',
-            label: '龙须面'
+            id: 5,
+            name: '龙须面'
           }, {
-            value: '北京烤鸭',
-            label: '北京烤鸭'
+            id: 6,
+            name: '北京烤鸭'
           },
           {
-            value: '颜色',
-            label: '颜色'
+            id: 7,
+            name: '颜色'
           }],
-        options: [{
-          value: 'M',
-          label: 'M'
-        }, {
-          value: 'L',
-          label: 'L'
-        }, {
-          value: 'XL',
-          label: 'XL'
-        }, {
-          value: 'S',
-          label: 'S'
-        }, {
-          value: '红色',
-          label: '红色'
-        },
+
+        specValueOptions: [
           {
-            value: '绿色',
-            label: '绿色'
+            "id": 3,
+            "goods_id": 1181000,
+            "specification_id": 1,
+            "value": "浅杏粉",
+            "pic_url": "http://yanxuan.nosdn.127.net/10022c73fa7aa75c2c0d736e96cc56d5.png?quality=90&thumbnail=200x200&imageView"
           },
           {
-            value: '金',
-            label: '金'
+            "id": 4,
+            "goods_id": 1181000,
+            "specification_id": 1,
+            "value": "玛瑙红",
+            "pic_url": "http://yanxuan.nosdn.127.net/29442127f431a1a1801c195905319427.png?quality=90&thumbnail=200x200&imageView"
           },
           {
-            value: '木',
-            label: '木'
-          },
-          {
-            value: '水',
-            label: '水'
+            "id": 5,
+            "goods_id": 1181000,
+            "specification_id": 1,
+            "value": "烟白灰",
+            "pic_url": "http://yanxuan.nosdn.127.net/36f64a7161b67e7fb8ea45be32ecfa25.png?quality=90&thumbnail=200x200&imageView"
           }
         ],
         userLIstOptions: [],
@@ -755,7 +710,7 @@
           ],
           introduce: [
             {required: true, message: '请输入卖点介绍', trigger: 'blur'},
-            {min: 3, max:50, message: '长度在 3 到 50 个字符', trigger: 'blur'}
+            {min: 3, max: 50, message: '长度在 3 到 50 个字符', trigger: 'blur'}
           ],
           region: [
             {required: true, message: '请选择活动区域', trigger: 'change'}
@@ -797,8 +752,7 @@
       // 表格数据
       tableData() {
         debugger
-        let arr = this.specPrices;
-
+        let arr = this.specPrices
 
 
 //        {
@@ -816,10 +770,10 @@
 //          store: 10
         console.log(arr)
         /*for (let i = 0; i < arr.length; i++) {
-          arr[i].spec0 = arr[i].specs[0]
-          arr[i].spec1 = arr[i].specs[1]
-          arr[i].spec2 = arr[i].specs[2]
-        }*/
+         arr[i].spec0 = arr[i].specs[0]
+         arr[i].spec1 = arr[i].specs[1]
+         arr[i].spec2 = arr[i].specs[2]
+         }*/
         // console.log(this.mySpecPrices)
         console.log('prices arr:-----')
         console.log(arr)
@@ -859,7 +813,7 @@
         // console.log(this.specs)
 
 
-        //        {
+        //      {
 //          "id": 1,
 //          "goods_id": 1181000,
 //          "goods_specification_ids": "1_5",
@@ -882,7 +836,7 @@
 //          store: 0
 //        }
 
-        let _obj=[{}]
+        let _obj = [{}]
         _obj[0].goods_specification_ids = ''
         _obj[0].prices = {
           marketPrice: 0,
@@ -910,6 +864,26 @@
 
     },
     methods: {
+
+      fetchSpecs() {
+        getSpecifications({}).then(response => {
+          debugger
+          this.productSpecsOptions = response.data.data
+        })
+      },
+      fetchSpecsValue(specName) {
+          debugger
+        let specId = ''
+        for (let i = 0; i < this.productSpecsOptions.length; i++) {
+          if (specName == this.productSpecsOptions[i].name) {
+            specId = this.productSpecsOptions[i].id
+          }
+        }
+        getSpecValue({specId: specId}).then(response => {
+          debugger
+          this.specValueOptions = response.data.data
+        })
+      },
       fetchData() {
         /*fetchArticle().then(response => {
          this.postForm = response.data
@@ -974,9 +948,9 @@
 
         this.postForm.specificationList.push(obj)
 
-       let defaultAddPrices = {
-            goods_number: 0,
-            retail_price: 0
+        let defaultAddPrices = {
+          goods_number: 0,
+          retail_price: 0
         }
 
 
@@ -986,8 +960,6 @@
         // 去更新价格数据
         debugger
         this.mySpecPrices(specCombinations, myDefaultAddPrices)
-
-
 
 
         if (this.postForm.specificationList.length >= 3) {
@@ -1023,13 +995,15 @@
 
 
 //        let obj = {value: '', isShow: false}
-        let obj = {isShow: false,
+        let obj = {
+          isShow: false,
           id: 1,
           goods_id: '',
           specification_id: '',
           value: "",
           pic_url: "",
-          name: ""}
+          name: ""
+        }
         /*   Array.prototype.indexOfObj = function (val) {
          for (var i = 0; i < this.length; i++) {
          if (this[i].value == val.value) return i;
@@ -1090,8 +1064,6 @@
         console.log(this.postForm.specificationList)
 
 
-
-
         let defaultAddPrices = {
           goods_number: 0,
           retail_price: 0
@@ -1110,13 +1082,15 @@
       addSpecsValue(spec, newSpecName, index, options) {
         debugger
 //        let obj = {value: '', isShow: false}
-        let obj = {isShow: false,
+        let obj = {
+          isShow: false,
           id: 1,
           goods_id: '',
           specification_id: '',
           value: "",
           pic_url: "",
-          name: ""}
+          name: ""
+        }
 
         // 删除已选择规格值，防止重复选择  ---- 暂时不使用
         /*    Array.prototype.indexOfObj = function (val) {
@@ -1154,17 +1128,16 @@
         let index = this.postForm.specificationList.indexOf(item)
 
 
-
         let defaultAddPrices = {
           goods_number: 0,
           retail_price: 0
         }
 
         if (index !== -1) {
-            debugger
+          debugger
           this.postForm.specificationList.splice(index, 1)
           console.log('删除后的-------------------------------------------------')
-          console.log( this.postForm.specificationList)
+          console.log(this.postForm.specificationList)
           // 删除后重新渲染规格价格表单
 
           // 每次点击添加, 保存一个defaultAddPrices的深拷贝副本, 防止数据关联
@@ -1201,6 +1174,9 @@
         this.postForm.specificationList[index].valueList[index2].isShow = !this.postForm.specificationList[index].valueList[index2].isShow
       },
       renderAddSpec(index, newSpecName) {
+
+        debugger
+
         console.log('specType: ' + newSpecName)
         this.postForm.specificationList[index].isShowValue = true
         this.postForm.specificationList[index].valueList.length = 0
@@ -1215,9 +1191,25 @@
           specification_id: '',
           value: "",
           pic_url: "",
-          name: ""}
+          name: ""
+        }
+
+        // 验证重复的
+        for (let j = 0; j <  this.postForm.specificationList.length; j++) {
+          if (this.postForm.specificationList[j].name === newSpecName.trim()) {
+            this.$message({
+              showClose: true,
+              message: '规格项名称不能为重复!',
+              type: 'warning'
+            })
+            this.postForm.specificationList[j].name = '' // 清空
+            return
+          }
+        }
+
 
         this.postForm.specificationList[index].valueList.push(obj)
+        this.fetchSpecsValue(newSpecName)
       },
       // 规格组合数组
       specCombinations() {
@@ -1233,22 +1225,22 @@
             arr1 = [{id: '', name: ''}]
           }
           if (arr2.length == 0) {
-            arr2 = [ {id: '', name: ''}]
+            arr2 = [{id: '', name: ''}]
           }
           if (arr3.length == 0) {
-            arr3 = [ {id: '', name: ''}]
+            arr3 = [{id: '', name: ''}]
           }
           let arr = []
 
-      /* {
-          id: 1,
-            goods_id: 1181000,
-            specification_id: 2,
-            value: "1.5m床垫*1+枕头*2",
-            pic_url: "",
-            name: "规格",
-            isShow: false
-        },*/
+          /* {
+           id: 1,
+           goods_id: 1181000,
+           specification_id: 2,
+           value: "1.5m床垫*1+枕头*2",
+           pic_url: "",
+           name: "规格",
+           isShow: false
+           },*/
 
           for (let t = 0; t < arr1.length; t++) {
             for (let i = 0; i < arr2.length; i++) {
@@ -1306,12 +1298,12 @@
       // 规格价格数据 local
       // 数据更新
       mySpecPrices(specCombinations, myDefaultAddPrices) {
-debugger
+        debugger
         // specCombinations 规格组合数组，
         // myDefaultAddPrices 默认规格对应价格等参数
 
         // 编辑数据时候
-        if(Array.isArray(myDefaultAddPrices)){
+        if (Array.isArray(myDefaultAddPrices)) {
 
           let arrWra = []
           // 规格组合 数组
@@ -1331,7 +1323,7 @@ debugger
             // 对比 新的 规格组合数组 与原价格数组
             let oldItem = this.specPrices.filter((element) => {
               let oldSpecIdArr = [];
-              for(let k = 0; k<arr[i].length; k++){
+              for (let k = 0; k < arr[i].length; k++) {
                 oldSpecIdArr.push(arr[i].id)
               }
               let specIds = element.goods_specification_ids
@@ -1341,7 +1333,7 @@ debugger
             let newItem = this.specPrices.filter((element) => {
 
               let oldSpecIdArr = [];
-              for(let k = 0; k<arr[i].length; k++){
+              for (let k = 0; k < arr[i].length; k++) {
                 oldSpecIdArr.push(arr[i].id)
               }
               let specIds = element.goods_specification_ids
@@ -1359,22 +1351,22 @@ debugger
               // 新规各项价格
             } else {
               debugger
-             //  绑定规格价格
+              //  绑定规格价格
               let newSpecPrices = '';
-              for(let x=0; x< myDefaultAddPrices.length; x++){
+              for (let x = 0; x < myDefaultAddPrices.length; x++) {
                 let oldSpecIdArr = [];
-                for(let k = 0; k<arr[i].length; k++){
+                for (let k = 0; k < arr[i].length; k++) {
                   oldSpecIdArr.push(arr[i][k].id)
                 }
                 debugger
-                let specIds = myDefaultAddPrices[x].goods_specification_ids +''
+                let specIds = myDefaultAddPrices[x].goods_specification_ids + ''
                 let specIdArr = specIds.split('_')
 
-                if(oldSpecIdArr.sort().toString() == specIdArr.sort().toString()){
+                if (oldSpecIdArr.sort().toString() == specIdArr.sort().toString()) {
                   newSpecPrices = myDefaultAddPrices[x]
                 }
               }
-debugger
+              debugger
 //               if (newItem.length != 0) {
 //               这里用深拷贝否则各新项目的价格数据会关联
               newItem[0].prices = JSON.parse(JSON.stringify(newSpecPrices));
@@ -1389,9 +1381,8 @@ debugger
           this.specPrices = arrWra
 
 
-
-        }else{
-debugger
+        } else {
+          debugger
           // function sameSpecs(element) {
           //   return element.specs == arr[i];
           // }
@@ -1399,7 +1390,7 @@ debugger
           // 规格组合 数组
           let arr = specCombinations
           for (let i = 0; i < arr.length; i++) {
-    debugger
+            debugger
             // 新增 规格价格 项
             let obj = {};
             obj.specs = arr[i];
@@ -1414,7 +1405,7 @@ debugger
             // 注意这里用的是length因为 空数组,空对象的布尔值为true
             // 旧规各项价格
             if (oldItem.length) {
-              obj.prices = JSON.parse(JSON.stringify( oldItem[0].prices ))
+              obj.prices = JSON.parse(JSON.stringify(oldItem[0].prices))
               // 新规各项价格
             } else {
               console.log(newItem)
@@ -1427,22 +1418,16 @@ debugger
             }
             arrWra.push(obj)
           }
-           console.log('规格组合和价格拼接后～～～～～～～～～～～～～～～～～～～～～')
+          console.log('规格组合和价格拼接后～～～～～～～～～～～～～～～～～～～～～')
           console.log(arrWra)
-        this.specPrices = arrWra
+          this.specPrices = arrWra
 
           debugger
           console.log(this.postForm)
         }
 
 
-
-
-
-
-
-
-      // console.log('规格组合和价格拼接后～～～～～～～～～～～～～～～～～～～～～')
+        // console.log('规格组合和价格拼接后～～～～～～～～～～～～～～～～～～～～～')
         //console.log(arrWra)
 //        this.specPrices = arrWra
       }

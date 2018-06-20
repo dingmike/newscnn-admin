@@ -46,6 +46,38 @@ export function updateHotStateGoods(data) {
   })
 }
 
+
+export function getSpecifications(query) {
+  return request({
+    url: 'goods/getSpecifications',
+    method: 'get',
+    params: query
+  })
+}
+
+export function getSpecValue(query) {
+  return request({
+    url: 'goods/getSpecValue',
+    method: 'get',
+    params: query
+  })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export function fetchArticle() {
   return request({
     url: '/article/detail',
