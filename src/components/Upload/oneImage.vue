@@ -19,7 +19,7 @@
       :show-file-list="false"
       :on-success="handleImageScucess"
       :before-upload="beforeUpload">
-      <img v-if="imageUrl" :src="imageUrl" class="avatar">
+      <img v-if="tempUrl" :src="tempUrl" class="avatar">
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
 
