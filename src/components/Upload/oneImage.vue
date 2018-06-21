@@ -17,6 +17,7 @@
       class="avatar-uploader"
       action="https://httpbin.org/post"
       :show-file-list="false"
+      :file-list="picFiles"
       :before-upload="beforeUpload"
       :on-success="handleImageScucess">
       <img v-if="tempUrl" :src="tempUrl" class="avatar">
@@ -62,8 +63,8 @@ export default {
     }
   },
   computed: {
-    imageUrl() {
-      return this.value
+    tempUrl() {
+      return this.fileList
     }
   },
   data() {
@@ -71,7 +72,6 @@ export default {
       single: false,
       dialogImageUrl: '',
       dialogVisible: false,
-      tempUrl: '',
       picFiles: this.fileList,
       dataObj: { token: '', key: '' }
     }
@@ -90,6 +90,7 @@ export default {
     handleImageScucess(res, file) {
 //      this.emitInput(file.files.file)
       this.tempUrl = URL.createObjectURL(file.raw);
+      this.fileList =  URL.createObjectURL(file.raw);
     },
     beforeUpload(file) {
       const _self = this
