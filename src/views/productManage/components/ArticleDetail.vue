@@ -1004,6 +1004,17 @@
           pic_url: "",
           name: ""
         }
+//        let obj =  options[index]
+
+
+       for(let i = 0;  i< options.length; i++){
+           if(options[i].value ===newSpecName){
+               obj = options[i]
+           }
+       }
+
+
+
         /*   Array.prototype.indexOfObj = function (val) {
          for (var i = 0; i < this.length; i++) {
          if (this[i].value == val.value) return i;
@@ -1042,7 +1053,7 @@
           }
 
         }
-
+        spec[index2] = obj
 
         /*
          if (!newSpecName) {
@@ -1055,7 +1066,7 @@
          */
 
 
-        obj.value = newSpecName
+//        obj.value = newSpecName
         /*if(obj.value){
          spec.push(obj)
          }*/
