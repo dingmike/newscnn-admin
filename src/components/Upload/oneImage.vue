@@ -12,13 +12,13 @@
       <i class="el-icon-plus"></i>
       <div slot="tip" class="el-upload__tip">添加图片(0/10)</div>
     </el-upload>-->
-
+<!--:before-upload="beforeUpload"-->
     <el-upload
       class="avatar-uploader"
-      action="https://jsonplaceholder.typicode.com/posts/"
+      action="https://httpbin.org/post"
       :show-file-list="false"
-      :on-success="handleImageScucess"
-      :before-upload="beforeUpload">
+      :before-upload="beforeUpload"
+      :on-success="handleImageScucess">
       <img v-if="tempUrl" :src="tempUrl" class="avatar">
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
@@ -87,12 +87,24 @@ export default {
     emitInput(val) {
       this.$emit('input', val)
     },
-    handleImageScucess(file) {
-      this.emitInput(file.files.file)
+    handleImageScucess(res, file) {
+//      this.emitInput(file.files.file)
+      this.tempUrl = URL.createObjectURL(file.raw);
     },
-    beforeUpload() {
+    beforeUpload(file) {
       const _self = this
-      return new Promise((resolve, reject) => {
+
+      const isJPG = file.type === 'image/jpeg';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      return isJPG && isLt2M;
+      /*return new Promise((resolve, reject) => {
         getToken().then(response => {
           const key = response.data.qiniu_key
           const token = response.data.qiniu_token
@@ -104,7 +116,7 @@ export default {
           console.log(err)
           reject(false)
         })
-      })
+      })*/
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
