@@ -47,7 +47,6 @@
     </div>-->
   </div>
 </template>
-
 <script>
 import elDragDialog from '@/directive/el-dragDialog' // base on element-ui
 import { getToken } from '@/api/qiniu'
