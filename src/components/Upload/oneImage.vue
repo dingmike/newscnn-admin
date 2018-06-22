@@ -23,7 +23,6 @@
       <img v-if="tempUrl" :src="tempUrl" class="avatar">
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
-
 <!--https://jsonplaceholder.typicode.com/posts/-->
   <!--  <el-upload class="image-uploader" :data="dataObj" drag :multiple="false" :show-file-list="false" action="https://httpbin.org/post"
       :on-success="handleImageScucess">
