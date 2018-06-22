@@ -1,50 +1,18 @@
 <template>
   <div class="upload-container">
-   <!-- <el-upload class="image-uploader"
-      :data="dataObj"
-      action="https://httpbin.org/post"
-      :multiple="single"
-      :file-list="picFiles"
-      :on-success="handleImageScucess"
-      list-type="picture-card"
-      :on-preview="handlePictureCardPreview"
-      :on-remove="handleRemove">
-      <i class="el-icon-plus"></i>
-      <div slot="tip" class="el-upload__tip">添加图片(0/10)</div>
-    </el-upload>-->
+
 <!--:before-upload="beforeUpload"-->
     <el-upload
       class="avatar-uploader"
       action="https://httpbin.org/post"
       :show-file-list="false"
-      :file-list="picFiles"
       :before-upload="beforeUpload"
       :on-success="handleImageScucess">
-      <img v-if="tempUrl" :src="tempUrl" class="avatar">
+      <img v-if="imageUrl2" :src="imageUrl2" class="avatar">
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
 <!--https://jsonplaceholder.typicode.com/posts/-->
-  <!--  <el-upload class="image-uploader" :data="dataObj" drag :multiple="false" :show-file-list="false" action="https://httpbin.org/post"
-      :on-success="handleImageScucess">
-      <i class="el-icon-upload"></i>
-      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-    </el-upload>
-    <div class="image-preview image-app-preview">
-      <div class="image-preview-wrapper" v-show="imageUrl.length>1">
-        <img :src="imageUrl">
-        <div class="image-preview-action">
-          <i @click="rmImage" class="el-icon-delete"></i>
-        </div>
-      </div>
-    </div>
-    <div class="image-preview">
-      <div class="image-preview-wrapper" v-show="imageUrl.length>1">
-        <img :src="imageUrl">
-        <div class="image-preview-action">
-          <i @click="rmImage" class="el-icon-delete"></i>
-        </div>
-      </div>
-    </div>-->
+
   </div>
 </template>
 <script>
@@ -55,20 +23,32 @@ export default {
   name: 'oneImageUpload',
   directives: { elDragDialog },
   props: {
-    fileList: {
-        type: String,
-        default: ''
-    }
+      value: String
   },
   computed: {
-    tempUrl() {
-      return this.fileList
+//    imageUrl() {
+//      console.log('oldPIc: ' + this.value)
+//      return this.value
+//    }
+    imageUrl: {
+      get: function () {
+        return this.value
+      },
+      // setter
+      set: function (newValue) {
+        this.imageUrl2 = newValue
+//        this.value = newValue
+        console.log(this.imageUrl2)
+//        console.log( this.value)
+      }
     }
+
   },
   data() {
     return {
       single: false,
       dialogImageUrl: '',
+      imageUrl2: '',
       dialogVisible: false,
       picFiles: this.fileList,
       dataObj: { token: '', key: '' }
@@ -87,7 +67,8 @@ export default {
     },
     handleImageScucess(res, file) {
 //      this.emitInput(file.files.file)
-      this.tempUrl = URL.createObjectURL(file.raw);
+      this.imageUrl = URL.createObjectURL(file.raw);
+      this.value =  URL.createObjectURL(file.raw);
       this.fileList =  URL.createObjectURL(file.raw);
     },
     beforeUpload(file) {
@@ -130,27 +111,33 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 @import "src/styles/mixin.scss";
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
+
+.upload-container{
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 20px;
+    color: #8c939d;
+    border: 1px dotted #ccc;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+  }
+  .avatar {
+    width: 60px;
+    height: 60px;
+    border: 1px dotted #ccc;
+    display: block;
+  }
 }
-.avatar-uploader .el-upload:hover {
-  border-color: #409EFF;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
-  text-align: center;
-}
-.avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-}
+
 </style>

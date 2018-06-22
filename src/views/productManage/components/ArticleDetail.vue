@@ -215,7 +215,7 @@
             </el-table-column>
             <el-table-column prop="" label="*图片">
               <template slot-scope="scope">
-                <Upload-single v-model="scope.row.prices.pic_url" :file-list="scope.row.prices.pic_url"></Upload-single>
+                <Upload-single v-model="scope.row.prices.pic_url" :value="scope.row.prices.pic_url"></Upload-single>
               </template>
             </el-table-column>
           </el-table>
